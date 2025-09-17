@@ -20,3 +20,6 @@
         @endforelse
     </tbody>
 </table>
+
+
+{{-- setup --}}
