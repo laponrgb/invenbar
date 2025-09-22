@@ -78,7 +78,9 @@ class BarangController extends Controller implements HasMiddleware
      */
     public function show(Barang $barang)
     {
-        //
+        $barang->load(['kategori', 'lokasi']);
+
+        return view('barang.show', compact('barang'));
     }
 
     /**
