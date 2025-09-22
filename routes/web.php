@@ -20,7 +20,12 @@ Route::middleware('auth')->group(function () {
     Route::resource('user', UserController::class);
     Route::resource('kategori', KategoriController::class);
     Route::resource('lokasi', LokasiController::class);
+
+    Route::get('/barang/laporan', [BarangController::class, 'cetakLaporan'])
+        ->name('barang.laporan');
+
     Route::resource('barang', BarangController::class);
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
