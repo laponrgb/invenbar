@@ -21,8 +21,18 @@
             <td>{{ $barang->lokasi->nama_lokasi }}</td>
             <td>{{ $barang->jumlah }} {{ $barang->satuan }}</td>
             <td>
-                <span class="badge bg-info">{{ $barang->kondisi }}</span>
+                @php
+                    $badgeClass = match ($barang->kondisi) {
+                        'sangat baik' => 'bg-info',
+                        'rusak ringan' => 'bg-warning',
+                        'rusak berat' => 'bg-danger',
+                        default => 'bg-secondary',
+                    };
+                @endphp
+
+                <span class="badge {{ $badgeClass }}">{{ $barang->kondisi }}</span>
             </td>
+
             <td class="text-end">
                 @can('manage barang')
                     <x-tombol-aksi href="{{ route('barang.show', $barang->id) }}" type="show" />
