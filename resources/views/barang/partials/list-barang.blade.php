@@ -23,9 +23,9 @@
             <td>
                 @php
                     $badgeClass = match ($barang->kondisi) {
-                        'sangat baik' => 'bg-info',
-                        'rusak ringan' => 'bg-warning',
-                        'rusak berat' => 'bg-danger',
+                        'Baik' => 'bg-info',
+                        'Rusak Ringan' => 'bg-warning',
+                        'Rusak Berat' => 'bg-danger',
                         default => 'bg-secondary',
                     };
                 @endphp
