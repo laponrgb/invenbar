@@ -52,29 +52,35 @@ class BarangController extends Controller implements HasMiddleware
      */
     public function store(Request $request)
     {
-            $validated = $request->validate([
-        'kode_barang'       => 'required|string|max:50|unique:barangs,kode_barang',
-        'nama_barang'       => 'required|string|max:150',
-        'kategori_id'       => 'required|exists:kategoris,id',
-        'lokasi_id'         => 'required|exists:lokasis,id',
-        'jumlah'            => 'required|integer|min:0',
-        'satuan'            => 'required|string|max:20',
-        'kondisi'           => 'required|in:Baik,Rusak Ringan,Rusak Berat',
-        'tanggal_pengadaan' => 'required|date',
-        'gambar'            => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-    ]);
+        $validated = $request->validate([
+            'kode_barang'          => 'required|string|max:50|unique:barangs,kode_barang',
+            'nama_barang'          => 'required|string|max:150',
+            'kategori_id'          => 'required|exists:kategoris,id',
+            'lokasi_id'            => 'required|exists:lokasis,id',
+            'satuan'               => 'required|string|max:20',
+            'jumlah_baik'          => 'required|integer|min:0',
+            'jumlah_rusak_ringan'  => 'required|integer|min:0',
+            'jumlah_rusak_berat'   => 'required|integer|min:0',
+            'tanggal_pengadaan'    => 'required|date',
+            'gambar'               => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
 
-    if ($request->hasFile('gambar')) {
-        $validated['gambar'] = $request->file('gambar')->store(null, 'gambar-barang');
+        $validated['jumlah'] = 
+            ($validated['jumlah_baik'] ?? 0) +
+            ($validated['jumlah_rusak_ringan'] ?? 0) +
+            ($validated['jumlah_rusak_berat'] ?? 0);
+
+        if ($request->hasFile('gambar')) {
+            $validated['gambar'] = $request->file('gambar')->store(null, 'gambar-barang');
+        }
+
+        Barang::create($validated);
+
+        return redirect()
+            ->route('barang.index')
+            ->with('success', 'Data barang berhasil ditambahkan.');
     }
 
-    Barang::create($validated);
-
-    return redirect()
-        ->route('barang.index')
-        ->with('success', 'Data barang berhasil ditambahkan.');
-    }
-    
     /**
      * Display the specified resource.
      */
@@ -96,40 +102,41 @@ class BarangController extends Controller implements HasMiddleware
         return view('barang.edit', compact('barang', 'kategori', 'lokasi'));
     }
 
-
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, Barang $barang)
     {
         $validated = $request->validate([
-    'kode_barang'       => 'required|string|max:50|unique:barangs,kode_barang,' . $barang->id,
-    'nama_barang'       => 'required|string|max:150',
-    'kategori_id'       => 'required|exists:kategoris,id',
-    'lokasi_id'         => 'required|exists:lokasis,id',
-    'jumlah'            => 'required|integer|min:0',
-    'satuan'            => 'required|string|max:20',
-    'kondisi'           => 'required|in:Baik,Rusak Ringan,Rusak Berat',
-    'tanggal_pengadaan' => 'required|date',
-    'gambar'            => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-]);
+            'kode_barang'          => 'required|string|max:50|unique:barangs,kode_barang,' . $barang->id,
+            'nama_barang'          => 'required|string|max:150',
+            'kategori_id'          => 'required|exists:kategoris,id',
+            'lokasi_id'            => 'required|exists:lokasis,id',
+            'satuan'               => 'required|string|max:20',
+            'jumlah_baik'          => 'required|integer|min:0',
+            'jumlah_rusak_ringan'  => 'required|integer|min:0',
+            'jumlah_rusak_berat'   => 'required|integer|min:0',
+            'tanggal_pengadaan'    => 'required|date',
+            'gambar'               => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
 
-if ($request->hasFile('gambar')) {
-    // hapus gambar lama kalau ada
-    if ($barang->gambar) {
-        Storage::disk('gambar-barang')->delete($barang->gambar);
-    }
+        $validated['jumlah'] = 
+            ($validated['jumlah_baik'] ?? 0) +
+            ($validated['jumlah_rusak_ringan'] ?? 0) +
+            ($validated['jumlah_rusak_berat'] ?? 0);
 
-    // upload gambar baru
-    $validated['gambar'] = $request->file('gambar')->store(null, 'gambar-barang');
-}
+        if ($request->hasFile('gambar')) {
+            if ($barang->gambar) {
+                Storage::disk('gambar-barang')->delete($barang->gambar);
+            }
+            $validated['gambar'] = $request->file('gambar')->store(null, 'gambar-barang');
+        }
 
-$barang->update($validated);
+        $barang->update($validated);
 
-return redirect()
-    ->route('barang.index')
-    ->with('success', 'Data barang berhasil diperbarui.');
-
+        return redirect()
+            ->route('barang.index')
+            ->with('success', 'Data barang berhasil diperbarui.');
     }
 
     /**

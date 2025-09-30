@@ -30,40 +30,40 @@
     </div>
 </div>
 
+{{-- Jumlah per kondisi --}}
 <div class="row mb-3">
-    <div class="col-md-6">
+    <div class="col-md-4">
         <x-form-input 
-            label="Jumlah" 
-            name="jumlah" 
+            label="Jumlah Baik" 
+            name="jumlah_baik" 
             type="number" 
-            :value="$barang->jumlah ?? ''" 
+            :value="$barang->jumlah_baik ?? 0" 
         />
     </div>
-    <div class="col-md-6">
+    <div class="col-md-4">
         <x-form-input 
-            label="Satuan" 
-            name="satuan" 
-            :value="$barang->satuan ?? ''" 
+            label="Jumlah Rusak Ringan" 
+            name="jumlah_rusak_ringan" 
+            type="number" 
+            :value="$barang->jumlah_rusak_ringan ?? 0" 
+        />
+    </div>
+    <div class="col-md-4">
+        <x-form-input 
+            label="Jumlah Rusak Berat" 
+            name="jumlah_rusak_berat" 
+            type="number" 
+            :value="$barang->jumlah_rusak_berat ?? 0" 
         />
     </div>
 </div>
 
 <div class="row mb-3">
     <div class="col-md-6">
-        @php
-            $kondisi = [
-                ['kondisi' => 'Baik'],
-                ['kondisi' => 'Rusak Ringan'],
-                ['kondisi' => 'Rusak Berat'],
-            ];
-        @endphp
-        <x-form-select 
-            label="Kondisi" 
-            name="kondisi" 
-            :value="$barang->kondisi ?? ''"
-            :option-data="$kondisi" 
-            option-label="kondisi" 
-            option-value="kondisi" 
+        <x-form-input 
+            label="Satuan" 
+            name="satuan" 
+            :value="$barang->satuan ?? ''" 
         />
     </div>
     <div class="col-md-6">
@@ -89,6 +89,7 @@
     />
 </div>
 
+{{-- ✅ Tombol dikembalikan ke sini --}}
 <div class="mt-4">
     <x-primary-button>
         {{ isset($update) ? 'Update' : 'Simpan' }}

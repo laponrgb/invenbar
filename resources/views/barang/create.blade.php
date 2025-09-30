@@ -4,9 +4,5 @@
         <div class="card-body">
             @include('barang.partials.form')
         </div>
-        <div class="card-footer text-end">
-            <button type="submit" class="btn btn-primary">Simpan</button>
-            <a href="{{ route('barang.index') }}" class="btn btn-secondary">Batal</a>
-        </div>
     </form>
 </x-main-layout>

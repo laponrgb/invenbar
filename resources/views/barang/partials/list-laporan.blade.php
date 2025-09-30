@@ -20,7 +20,19 @@
                 <td>{{ $barang->kategori->nama_kategori }}</td>
                 <td>{{ $barang->lokasi->nama_lokasi }}</td>
                 <td>{{ $barang->jumlah }} {{ $barang->satuan }}</td>
-                <td>{{ $barang->kondisi }}</td>
+                <td>
+                    <div style="display: flex; flex-direction: column; gap: 2px;">
+                        <p><span class="badge bg-info">
+                            Baik: {{ $barang->jumlah_baik }}
+                        </span></p>
+                        <p><span class="badge bg-warning text-dark">
+                            Rusak Ringan: {{ $barang->jumlah_rusak_ringan }}
+                        </span></p>
+                        <p><span class="badge bg-danger">
+                            Rusak Berat: {{ $barang->jumlah_rusak_berat }}
+                        </span></p>
+                    </div>
+                </td>
                 <td>{{ \Carbon\Carbon::parse($barang->tanggal_pengadaan)->format('d-m-Y') }}</td>
             </tr>
         @empty
