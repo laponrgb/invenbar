@@ -21,17 +21,27 @@
             <td>{{ $barang->lokasi->nama_lokasi }}</td>
             <td>{{ $barang->jumlah }} {{ $barang->satuan }}</td>
             <td>
-                @php
-                    $badgeClass = match ($barang->kondisi) {
-                        'Baik' => 'bg-info',
-                        'Rusak Ringan' => 'bg-warning',
-                        'Rusak Berat' => 'bg-danger',
-                        default => 'bg-secondary',
-                    };
-                @endphp
+                <div class="d-flex flex-column gap-1">
+                    @if ($barang->jumlah_baik > 0)
+                        <span class="badge bg-info">
+                            Baik: {{ $barang->jumlah_baik }}
+                        </span>
+                    @endif
 
-                <span class="badge {{ $badgeClass }}">{{ $barang->kondisi }}</span>
+                    @if ($barang->jumlah_rusak_ringan > 0)
+                        <span class="badge bg-warning text-dark">
+                            Rusak Ringan: {{ $barang->jumlah_rusak_ringan }}
+                        </span>
+                    @endif
+
+                    @if ($barang->jumlah_rusak_berat > 0)
+                        <span class="badge bg-danger">
+                            Rusak Berat: {{ $barang->jumlah_rusak_berat }}
+                        </span>
+                    @endif
+                </div>
             </td>
+
 
             <td class="text-end">
                 @can('manage barang')
