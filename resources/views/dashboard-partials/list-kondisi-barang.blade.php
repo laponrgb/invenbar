@@ -2,30 +2,28 @@
     @php
         $kondisis = [
             [
-                'judul' => 'Baik',
-                'jumlah' => $jumlahBarang,
+                'judul'   => 'Baik',
+                'jumlah'  => $jumlahBarang,
                 'kondisi' => $kondisiBaik,
-                'color' => 'success',
+                'color'   => 'success',
             ],
             [
-                'judul' => 'Rusak Ringan',
-                'jumlah' => $jumlahBarang,
+                'judul'   => 'Rusak Ringan',
+                'jumlah'  => $jumlahBarang,
                 'kondisi' => $kondisiRusakRingan,
-                'color' => 'warning',
+                'color'   => 'warning',
             ],
             [
-                'judul' => 'Rusak Berat',
-                'jumlah' => $jumlahBarang,
+                'judul'   => 'Rusak Berat',
+                'jumlah'  => $jumlahBarang,
                 'kondisi' => $kondisiRusakBerat,
-                'color' => 'danger',
+                'color'   => 'danger',
             ],
         ];
     @endphp
 
     @foreach ($kondisis as $kondisi)
-        @php
-            extract($kondisi);
-        @endphp
+        @php extract($kondisi); @endphp
         <x-progress-kondisi 
             :judul="$judul" 
             :jumlah="$jumlah" 
