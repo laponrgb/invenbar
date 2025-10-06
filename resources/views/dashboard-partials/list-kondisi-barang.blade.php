@@ -1,21 +1,25 @@
 <div class="card-body">
     @php
+        // Hitung total kondisi sebenarnya
+        $totalKondisi = $kondisiBaik + $kondisiRusakRingan + $kondisiRusakBerat;
+        $totalKondisi = $totalKondisi > 0 ? $totalKondisi : 1;
+
         $kondisis = [
             [
                 'judul'   => 'Baik',
-                'jumlah'  => $jumlahBarang,
+                'jumlah'  => $totalKondisi,
                 'kondisi' => $kondisiBaik,
                 'color'   => 'success',
             ],
             [
                 'judul'   => 'Rusak Ringan',
-                'jumlah'  => $jumlahBarang,
+                'jumlah'  => $totalKondisi,
                 'kondisi' => $kondisiRusakRingan,
                 'color'   => 'warning',
             ],
             [
                 'judul'   => 'Rusak Berat',
-                'jumlah'  => $jumlahBarang,
+                'jumlah'  => $totalKondisi,
                 'kondisi' => $kondisiRusakBerat,
                 'color'   => 'danger',
             ],
