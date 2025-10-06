@@ -20,14 +20,44 @@
             <th>Kondisi</th>
             <td>
                 @php
-                    $badgeClass = 'bg-success';
-                    if ($barang->kondisi === 'Rusak Ringan') {
-                        $badgeClass = 'bg-warning text-dark';
-                    } elseif ($barang->kondisi === 'Rusak Berat') {
-                        $badgeClass = 'bg-danger';
-                    }
+                    $total = $barang->jumlah > 0 ? $barang->jumlah : 1; // hindari pembagian 0
+                    $baik = ($barang->jumlah_baik / $total) * 100;
+                    $ringan = ($barang->jumlah_rusak_ringan / $total) * 100;
+                    $berat = ($barang->jumlah_rusak_berat / $total) * 100;
                 @endphp
-                <span class="badge {{ $badgeClass }}">{{ $barang->kondisi }}</span>
+
+                <div class="mb-1">
+                    @if ($barang->jumlah_baik > 0)
+                        <span class="badge bg-success">
+                            Baik: {{ $barang->jumlah_baik }} ({{ number_format($baik, 1) }}%)
+                        </span>
+                    @endif
+
+                    @if ($barang->jumlah_rusak_ringan > 0)
+                        <span class="badge bg-warning text-dark">
+                            Rusak Ringan: {{ $barang->jumlah_rusak_ringan }} ({{ number_format($ringan, 1) }}%)
+                        </span>
+                    @endif
+
+                    @if ($barang->jumlah_rusak_berat > 0)
+                        <span class="badge bg-danger">
+                            Rusak Berat: {{ $barang->jumlah_rusak_berat }} ({{ number_format($berat, 1) }}%)
+                        </span>
+                    @endif
+                </div>
+
+                {{-- Progress bar kondisi --}}
+                <div class="progress" style="height: 12px;">
+                    @if ($barang->jumlah_baik > 0)
+                        <div class="progress-bar bg-success" style="width: {{ $baik }}%"></div>
+                    @endif
+                    @if ($barang->jumlah_rusak_ringan > 0)
+                        <div class="progress-bar bg-warning" style="width: {{ $ringan }}%"></div>
+                    @endif
+                    @if ($barang->jumlah_rusak_berat > 0)
+                        <div class="progress-bar bg-danger" style="width: {{ $berat }}%"></div>
+                    @endif
+                {{-- </div> --}}
             </td>
         </tr>
         <tr>
