@@ -18,6 +18,7 @@
         @php
             $navs = [
                 [ 'route' => 'dashboard', 'name' => 'Dashboard' ],
+                [ 'route' => 'peminjaman.index', 'name' => 'Peminjaman' ],
                 [ 'route' => 'barang.index', 'name' => 'Barang' ],
                 [ 'route' => 'lokasi.index', 'name' => 'Lokasi' ],
                 [ 'route' => 'kategori.index', 'name' => 'Kategori' ],
