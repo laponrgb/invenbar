@@ -81,7 +81,7 @@ class UserController extends Controller implements HasMiddleware
     {
         return view('user.edit', compact('user'));
     }
-
+    
     /**
      * Update the specified resource in storage.
      */
