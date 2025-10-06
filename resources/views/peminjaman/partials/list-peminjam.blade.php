@@ -73,21 +73,26 @@
     /* Grid agar 2 kolom badge per baris, tombol expand ikut grid */
     .barang-grid {
         display: grid;
-        grid-template-columns: repeat(2, auto);
+        grid-template-columns: repeat(2, 1fr); /* 2 kolom sama lebar */
         gap: 0.25rem 0.4rem;
         align-items: center;
     }
 
-    .detail-badge {
+    .detail-badge,
+    .toggle-detail {
         font-size: 0.85rem;
         white-space: nowrap;
+        text-align: center;
+        min-width: 100px; /* sesuaikan agar semua sama */
+        padding: 0.25rem 0.45rem;
+        display: inline-flex;
+        justify-content: center;
     }
 
     .toggle-detail {
         font-size: 0.8rem;
-        padding: 0.25rem 0.45rem;
-        justify-self: stretch; /* full width */
-        text-align: center;
+        cursor: pointer;
+        user-select: none;
     }
 </style>
 
