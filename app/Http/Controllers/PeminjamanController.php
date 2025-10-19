@@ -10,6 +10,14 @@ use Illuminate\Support\Facades\DB;
 
 class PeminjamanController extends Controller
 {
+    private function generateKodePeminjaman()
+    {
+        do {
+            $kode = date('Ymd') . '-' . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
+        } while (Peminjaman::where('kode_peminjaman', $kode)->exists());
+        
+        return $kode;
+    }
     public function index()
     {
         $peminjamans = Peminjaman::with('details.barang')->latest()->paginate(10);
@@ -29,16 +37,19 @@ class PeminjamanController extends Controller
             'telepon_peminjam' => 'required|string|max:20',
             'email_peminjam' => 'nullable|email',
             'tanggal_pinjam' => 'required|date',
+            'tanggal_kembali' => 'nullable|date|after_or_equal:tanggal_pinjam',
             'barang_id' => 'required|array',
             'jumlah' => 'required|array',
         ]);
 
         DB::transaction(function () use ($request) {
             $peminjaman = Peminjaman::create([
+                'kode_peminjaman' => $this->generateKodePeminjaman(),
                 'nama_peminjam' => $request->nama_peminjam,
                 'telepon_peminjam' => $request->telepon_peminjam,
                 'email_peminjam' => $request->email_peminjam,
                 'tanggal_pinjam' => $request->tanggal_pinjam,
+                'tanggal_kembali' => $request->tanggal_kembali,
                 'status' => 'Dipinjam',
             ]);
 
@@ -94,6 +105,7 @@ class PeminjamanController extends Controller
             'telepon_peminjam' => 'required|string|max:20',
             'email_peminjam' => 'nullable|email',
             'tanggal_pinjam' => 'required|date',
+            'tanggal_kembali' => 'nullable|date|after_or_equal:tanggal_pinjam',
             'barang_id' => 'required|array',
             'jumlah' => 'required|array',
         ]);
@@ -146,6 +158,7 @@ class PeminjamanController extends Controller
                 'telepon_peminjam',
                 'email_peminjam',
                 'tanggal_pinjam',
+                'tanggal_kembali',
             ]));
 
             // 6) Reset detail dan masukkan detail baru sesuai $newQtyMap
@@ -171,7 +184,10 @@ class PeminjamanController extends Controller
             }
         }
 
-        $peminjaman->update(['status' => 'Dikembalikan']);
+        $peminjaman->update([
+            'status' => 'Dikembalikan',
+            'tanggal_kembali' => now()->format('Y-m-d')
+        ]);
         return back()->with('success', 'Barang berhasil dikembalikan.');
     }
 
@@ -184,7 +200,10 @@ class PeminjamanController extends Controller
             }
         }
 
-        $peminjaman->update(['status' => 'Dipinjam']);
+        $peminjaman->update([
+            'status' => 'Dipinjam',
+            'tanggal_kembali' => null
+        ]);
         return back()->with('success', 'Pengembalian barang dibatalkan.');
     }
 

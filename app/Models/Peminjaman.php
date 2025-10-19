@@ -10,6 +10,7 @@ class Peminjaman extends Model
     protected $table = 'peminjamans';
 
     protected $fillable = [
+        'kode_peminjaman',
         'nama_peminjam',
         'telepon_peminjam',
         'email_peminjam',

@@ -1,3 +1,11 @@
+@if(isset($peminjaman) && $peminjaman->kode_peminjaman)
+<div class="row mb-3">
+    <div class="col-md-12">
+        <x-form-input label="Kode Peminjaman" name="kode_peminjaman" :value="$peminjaman->kode_peminjaman" readonly />
+    </div>
+</div>
+@endif
+
 <div class="row mb-3">
     <div class="col-md-4">
         <x-form-input label="Nama Peminjam" name="nama_peminjam" :value="$peminjaman->nama_peminjam ?? ''" required />
@@ -12,10 +20,17 @@
     </div>
 </div>
 
-<div class="mb-3">
-    <x-form-input type="date" label="Tanggal Peminjaman" name="tanggal_pinjam"
-        :value="$peminjaman->tanggal_pinjam ?? now()->format('Y-m-d')" required />
-    <small class="text-danger error-message" data-for="tanggal_pinjam"></small>
+<div class="row mb-3">
+    <div class="col-md-6">
+        <x-form-input type="date" label="Tanggal Peminjaman" name="tanggal_pinjam"
+            :value="$peminjaman->tanggal_pinjam ?? now()->format('Y-m-d')" required />
+        <small class="text-danger error-message" data-for="tanggal_pinjam"></small>
+    </div>
+    <div class="col-md-6">
+        <x-form-input type="date" label="Tanggal Pengembalian" name="tanggal_kembali"
+            :value="$peminjaman->tanggal_kembali ?? now()->addDays(7)->format('Y-m-d')" />
+        <small class="text-danger error-message" data-for="tanggal_kembali"></small>
+    </div>
 </div>
 
 <hr>
@@ -110,6 +125,23 @@ function setupAutocomplete(input){
 
 document.addEventListener('DOMContentLoaded',()=>document.querySelectorAll('.barang-input').forEach(setupAutocomplete));
 
+// Auto-update return date when borrowing date changes
+document.addEventListener('DOMContentLoaded', () => {
+    const tanggalPinjamInput = document.querySelector('input[name="tanggal_pinjam"]');
+    const tanggalKembaliInput = document.querySelector('input[name="tanggal_kembali"]');
+    
+    if (tanggalPinjamInput && tanggalKembaliInput) {
+        tanggalPinjamInput.addEventListener('change', () => {
+            if (tanggalPinjamInput.value) {
+                const pinjamDate = new Date(tanggalPinjamInput.value);
+                const kembaliDate = new Date(pinjamDate);
+                kembaliDate.setDate(kembaliDate.getDate() + 7);
+                tanggalKembaliInput.value = kembaliDate.toISOString().split('T')[0];
+            }
+        });
+    }
+});
+
 document.getElementById('btn-tambah-row').addEventListener('click',()=>createRow());
 document.addEventListener('click',e=>{if(e.target.classList.contains('btn-hapus-row')){if(barangList.children.length>1)e.target.closest('.barang-row').remove();else highlightError(barangList.querySelector('.barang-input'),"Minimal satu barang harus dipinjam.");}});
 document.addEventListener('input',e=>{if(e.target.classList.contains('jumlah-input')){const max=parseInt(e.target.max||1),min=parseInt(e.target.min||1),val=parseInt(e.target.value); if(val>max)e.target.value=max; if(val<min||isNaN(val))e.target.value=min;}});
@@ -117,6 +149,15 @@ document.addEventListener('input',e=>{if(e.target.classList.contains('jumlah-inp
 document.getElementById('btn-submit').addEventListener('click',e=>{
     let valid=true; document.querySelectorAll('.form-control').forEach(clearError);
     [['nama_peminjam','Nama wajib diisi'],['telepon_peminjam','Nomor telepon wajib diisi'],['tanggal_pinjam','Tanggal wajib diisi']].forEach(([name,msg])=>{const el=document.querySelector(`input[name="${name}"]`); if(!el.value.trim()){highlightError(el,msg); valid=false;}});
+    
+    // Validasi tanggal pengembalian
+    const tanggalPinjam = document.querySelector('input[name="tanggal_pinjam"]').value;
+    const tanggalKembali = document.querySelector('input[name="tanggal_kembali"]').value;
+    if(tanggalKembali && tanggalPinjam && tanggalKembali < tanggalPinjam) {
+        highlightError(document.querySelector('input[name="tanggal_kembali"]'), 'Tanggal pengembalian tidak boleh lebih awal dari tanggal peminjaman');
+        valid = false;
+    }
+    
     document.querySelectorAll('.barang-row').forEach(row=>{const nama=row.querySelector('.barang-input'),id=row.querySelector('input[name="barang_id[]"]'),jumlah=row.querySelector('.jumlah-input'),stok=parseInt(jumlah.max||1); if(!nama.value.trim()||!id.value.trim()){highlightError(nama,"Pilih barang dari daftar"); valid=false;} if(jumlah.value<1||jumlah.value>stok){highlightError(jumlah,`Jumlah antara 1 - ${stok}`); valid=false;}});
     if(!valid)e.preventDefault();
 });

@@ -9,6 +9,7 @@ return new class extends Migration {
     {
         Schema::create('peminjamans', function (Blueprint $table) {
             $table->id();
+            $table->string('kode_peminjaman')->unique();
             $table->string('nama_peminjam');
             $table->string('telepon_peminjam');
             $table->string('email_peminjam')->nullable();

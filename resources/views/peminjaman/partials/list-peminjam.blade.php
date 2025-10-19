@@ -2,9 +2,11 @@
     <x-slot name="header">
         <tr>
             <th>#</th>
+            <th>Kode</th>
             <th>Nama Peminjam</th>
             <th>Telepon</th>
             <th>Tanggal Pinjam</th>
+            <th>Tanggal Kembali</th>
             <th>Status</th>
             <th>Barang Dipinjam</th>
             <th>&nbsp;</th>
@@ -14,9 +16,13 @@
     @forelse ($peminjamans as $index => $peminjaman)
         <tr>
             <td>{{ $peminjamans->firstItem() + $index }}</td>
+            <td>
+                <span class="badge bg-info text-dark">{{ $peminjaman->kode_peminjaman }}</span>
+            </td>
             <td>{{ $peminjaman->nama_peminjam }}</td>
             <td>{{ $peminjaman->telepon_peminjam }}</td>
             <td>{{ $peminjaman->tanggal_pinjam }}</td>
+            <td>{{ $peminjaman->tanggal_kembali ?? '-' }}</td>
             <td>
                 <span class="badge {{ $peminjaman->status == 'Dipinjam' ? 'bg-warning text-dark' : 'bg-success' }}">
                     {{ $peminjaman->status }}
@@ -29,20 +35,25 @@
                     $count = $details->count();
                 @endphp
 
-                <div class="barang-grid">
-                    @foreach($details as $i => $detail)
-                        <span class="badge bg-primary detail-badge" style="{{ $i >= 2 ? 'display:none;' : '' }}">
-                            {{ $detail->barang->nama_barang }} ({{ $detail->jumlah }})
-                        </span>
-                    @endforeach
-
-                    @if($count > 2)
-                        <span class="badge bg-secondary toggle-detail"
-                              style="cursor:pointer; user-select:none; white-space:nowrap;">
-                            +{{ $count - 2 }}
-                        </span>
-                    @endif
-                </div>
+                @if($count > 0)
+                    <div class="barang-summary">
+                        @if($count == 1)
+                            <span class="badge bg-primary">{{ $details->first()->barang->nama_barang }} ({{ $details->first()->jumlah }})</span>
+                        @else
+                            <span class="badge bg-primary">{{ $details->first()->barang->nama_barang }} ({{ $details->first()->jumlah }})</span>
+                            @if($count > 1)
+                                <button type="button" class="btn btn-sm btn-outline-secondary ms-1" 
+                                        
+                                data-bs-toggle="modal" 
+                                        data-bs-target="#barangModal{{ $peminjaman->id }}">
+                                    +{{ $count - 1 }} lainnya
+                                </button>
+                            @endif
+                        @endif
+                    </div>
+                @else
+                    <span class="text-muted">-</span>
+                @endif
             </td>
 
             <td class="text-end">
@@ -62,58 +73,86 @@
         </tr>
     @empty
         <tr>
-            <td colspan="7" class="text-center">
+            <td colspan="9" class="text-center">
                 <div class="alert alert-danger mb-0">Belum ada data peminjaman.</div>
             </td>
         </tr>
     @endforelse
 </x-table-list>
 
+{{-- Modal untuk menampilkan daftar barang lengkap --}}
+@foreach ($peminjamans as $peminjaman)
+    @if(($peminjaman->details ?? collect())->count() > 1)
+        <div class="modal fade" id="barangModal{{ $peminjaman->id }}" tabindex="-1" aria-labelledby="barangModalLabel{{ $peminjaman->id }}" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="barangModalLabel{{ $peminjaman->id }}">
+                            Daftar Barang Dipinjam - {{ $peminjaman->nama_peminjam }}
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <strong>Kode Peminjaman:</strong><br>
+                                <span class="badge bg-info text-dark">{{ $peminjaman->kode_peminjaman }}</span>
+                            </div>
+                            <div class="col-md-4">
+                                <strong>Nama Peminjam:</strong><br>
+                                {{ $peminjaman->nama_peminjam }}
+                            </div>
+                            <div class="col-md-4">
+                                <strong>Tanggal Pinjam:</strong><br>
+                                {{ $peminjaman->tanggal_pinjam }}
+                            </div>
+                        </div>
+                        <hr>
+                        <h6>Daftar Barang:</h6>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Nama Barang</th>
+                                        <th>Jumlah</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($peminjaman->details as $index => $detail)
+                                        <tr>
+                                            <td>{{ $index + 1 }}</td>
+                                            <td>{{ $detail->barang->nama_barang }}</td>
+                                            <td>{{ $detail->jumlah }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+@endforeach
+
 <style>
-    /* Grid agar 2 kolom badge per baris, tombol expand ikut grid */
-    .barang-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr); /* 2 kolom sama lebar */
-        gap: 0.25rem 0.4rem;
+    .barang-summary {
+        display: flex;
         align-items: center;
+        flex-wrap: wrap;
+        gap: 0.25rem;
     }
-
-    .detail-badge,
-    .toggle-detail {
+    
+    .barang-summary .badge {
         font-size: 0.85rem;
-        white-space: nowrap;
-        text-align: center;
-        min-width: 100px; /* sesuaikan agar semua sama */
-        padding: 0.25rem 0.45rem;
-        display: inline-flex;
-        justify-content: center;
     }
-
-    .toggle-detail {
+    
+    .barang-summary .btn {
         font-size: 0.8rem;
-        cursor: pointer;
-        user-select: none;
+        padding: 0.2rem 0.5rem;
     }
 </style>
-
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.toggle-detail').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const container = btn.closest('.barang-grid');
-            const badges = container.querySelectorAll('.detail-badge');
-            const hidden = Array.from(badges).some(b => b.style.display === 'none');
-
-            badges.forEach((b, i) => {
-                if (hidden) {
-                    b.style.display = 'inline-flex';
-                } else {
-                    b.style.display = i < 2 ? 'inline-flex' : 'none';
-                }
-            });
-
-            btn.textContent = hidden ? '−' : `+${badges.length - 2}`;
-        });
-    });
-});
-</script>
