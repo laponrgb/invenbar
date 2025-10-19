@@ -1,12 +1,14 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SumberDanaController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\KategoriController;
 use App\Http\Controllers\LokasiController;
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PeminjamanController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -20,11 +22,16 @@ Route::middleware('auth')->group(function () {
     Route::resource('user', UserController::class);
     Route::resource('kategori', KategoriController::class);
     Route::resource('lokasi', LokasiController::class);
+    Route::resource('sumberdana', SumberDanaController::class);
 
     Route::get('/barang/laporan', [BarangController::class, 'cetakLaporan'])
         ->name('barang.laporan');
 
     Route::resource('barang', BarangController::class);
+
+    Route::resource('peminjaman', PeminjamanController::class);
+    Route::patch('peminjaman/{peminjaman}/return', [PeminjamanController::class, 'return'])->name('peminjaman.return');
+    Route::patch('peminjaman/{peminjaman}/undo', [PeminjamanController::class, 'undoReturn'])->name('peminjaman.undo');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

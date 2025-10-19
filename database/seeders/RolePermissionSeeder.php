@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
@@ -14,22 +13,35 @@ class RolePermissionSeeder extends Seeder
     {
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
+        // === Barang ===
         Permission::create(['name' => 'manage barang']);
         Permission::create(['name' => 'delete barang']);
+
+        // === Kategori ===
         Permission::create(['name' => 'view kategori']);
         Permission::create(['name' => 'manage kategori']);
+
+        // === Lokasi ===
         Permission::create(['name' => 'view lokasi']);
         Permission::create(['name' => 'manage lokasi']);
 
-        $petugasRole = Role::create(['name' => 'petugas']);
-        $adminRole   = Role::create(['name' => 'admin']);
+        // === Sumber Dana ===
+        Permission::create(['name' => 'view sumberdana']);
+        Permission::create(['name' => 'manage sumberdana']);
 
+        // === Role setup ===
+        $petugasRole = Role::firstOrCreate(['name' => 'petugas']);
+        $adminRole   = Role::firstOrCreate(['name' => 'admin']);
+
+        // Petugas hanya bisa melihat & kelola barang, kategori, lokasi
         $petugasRole->givePermissionTo([
             'manage barang',
             'view kategori',
             'view lokasi',
+            'view sumberdana',
         ]);
 
+        // Admin punya semua izin
         $adminRole->givePermissionTo(Permission::all());
     }
 }

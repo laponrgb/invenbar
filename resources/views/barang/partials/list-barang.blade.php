@@ -6,6 +6,7 @@
             <th>Nama Barang</th>
             <th>Kategori</th>
             <th>Lokasi</th>
+            <th>Sumber Dana</th>
             <th>Jumlah</th>
             <th>Kondisi</th>
             <th>&nbsp;</th>
@@ -19,29 +20,30 @@
             <td>{{ $barang->nama_barang }}</td>
             <td>{{ $barang->kategori->nama_kategori }}</td>
             <td>{{ $barang->lokasi->nama_lokasi }}</td>
+             <td>{{ $barang->sumberdana->nama_sumberdana ?? '-' }}</td>
             <td>{{ $barang->jumlah }} {{ $barang->satuan }}</td>
+
             <td>
                 <div class="d-flex flex-column gap-1">
                     @if ($barang->jumlah_baik > 0)
-                        <span class="badge bg-info">
+                        <span class="badge bg-info badge-condensed">
                             Baik: {{ $barang->jumlah_baik }}
                         </span>
                     @endif
 
                     @if ($barang->jumlah_rusak_ringan > 0)
-                        <span class="badge bg-warning text-dark">
+                        <span class="badge bg-warning text-dark badge-condensed">
                             Rusak Ringan: {{ $barang->jumlah_rusak_ringan }}
                         </span>
                     @endif
 
                     @if ($barang->jumlah_rusak_berat > 0)
-                        <span class="badge bg-danger">
+                        <span class="badge bg-danger badge-condensed">
                             Rusak Berat: {{ $barang->jumlah_rusak_berat }}
                         </span>
                     @endif
                 </div>
             </td>
-
 
             <td class="text-end">
                 @can('manage barang')
@@ -56,10 +58,24 @@
     @empty
         <tr>
             <td colspan="8" class="text-center">
-                <div class="alert alert-danger">
+                <div class="alert alert-danger mb-0">
                     Data barang belum tersedia.
                 </div>
             </td>
         </tr>
     @endforelse
 </x-table-list>
+
+<style>
+.badge-condensed {
+    display: inline-block;
+    max-width: 120px; /* batas lebar badge */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: clamp(10px, 1.8vw, 12px); /* auto kecil kalau kepanjangan */
+    line-height: 1.2; /* jaga tinggi badge */
+    text-align: center;
+    vertical-align: middle;
+}
+</style>

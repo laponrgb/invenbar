@@ -12,16 +12,21 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $jumlahBarang   = Barang::sum('jumlah'); // total barang semua kondisi
+        // Total barang = jumlah dari semua kondisi
+        $jumlahBarang = Barang::sum('jumlah_baik')
+                      + Barang::sum('jumlah_rusak_ringan')
+                      + Barang::sum('jumlah_rusak_berat');
+
         $jumlahKategori = Kategori::count();
         $jumlahLokasi   = Lokasi::count();
         $jumlahUser     = User::count();
-
-        // Hitung per kondisi
+        
+        // Hitung jumlah per kondisi
         $kondisiBaik        = Barang::sum('jumlah_baik');
         $kondisiRusakRingan = Barang::sum('jumlah_rusak_ringan');
         $kondisiRusakBerat  = Barang::sum('jumlah_rusak_berat');
 
+        // Barang terbaru (opsional untuk ditampilkan di dashboard)
         $barangTerbaru = Barang::with(['kategori', 'lokasi'])
             ->latest()
             ->take(5)

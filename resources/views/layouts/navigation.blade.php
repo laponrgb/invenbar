@@ -15,39 +15,73 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <!-- Left Side -->
             <ul class="navbar-nav me-auto">
-        @php
-            $navs = [
-                [ 'route' => 'dashboard', 'name' => 'Dashboard' ],
-                [ 'route' => 'barang.index', 'name' => 'Barang' ],
-                [ 'route' => 'lokasi.index', 'name' => 'Lokasi' ],
-                [ 'route' => 'kategori.index', 'name' => 'Kategori' ],
-                [ 'route' => 'user.index', 'name' => 'User', 'role' => 'admin' ],
-            ];
-        @endphp
+                @php
+                    // Menu utama
+                    $navs = [
+                        [ 'route' => 'dashboard', 'name' => 'Dashboard' ],
+                        [ 'route' => 'peminjaman.index', 'name' => 'Peminjaman' ],
+                    ];
 
-        @foreach ($navs as $nav)
-            @php
-                $route = $nav['route'];
-                $name = $nav['name'];
-                $role = $nav['role'] ?? null;
-            @endphp
+                    // Dropdown Data Barang
+                    $dataBarang = [
+                        [ 'route' => 'barang.index', 'name' => 'Barang' ],
+                        [ 'route' => 'lokasi.index', 'name' => 'Lokasi' ],
+                        [ 'route' => 'kategori.index', 'name' => 'Kategori' ],
+                        [ 'route' => 'sumberdana.index', 'name' => 'Sumber Dana' ],
+                    ];
 
-            @if ($role)
-                @role($role)
+                    // Tentukan halaman aktif di dalam dropdown
+                    $activeDropdownName = 'Data Barang'; // default
+                    foreach ($dataBarang as $item) {
+                        if (request()->routeIs($item['route'])) {
+                            $activeDropdownName = $item['name'];
+                            break;
+                        }
+                    }
+
+                    // Menu khusus role admin
+                    $adminNavs = [
+                        [ 'route' => 'user.index', 'name' => 'User', 'role' => 'admin' ],
+                    ];
+                @endphp
+
+                {{-- Menu utama --}}
+                @foreach ($navs as $nav)
                     <li class="nav-item">
-                        <x-nav-link :active="request()->routeIs($route)" :href="route($route)">
-                            {{ $name }}
+                        <x-nav-link :active="request()->routeIs($nav['route'])" :href="route($nav['route'])">
+                            {{ $nav['name'] }}
                         </x-nav-link>
                     </li>
-                @endrole
-            @else
-                <li class="nav-item">
-                    <x-nav-link :active="request()->routeIs($route)" :href="route($route)">
-                        {{ $name }}
-                    </x-nav-link>
+                @endforeach
+
+                {{-- Dropdown Data Barang --}}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle {{ request()->is('barang*') || request()->is('lokasi*') || request()->is('kategori*') || request()->is('sumberdana*') ? 'active' : '' }}"
+                       href="#" id="dataBarangDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        {{ $activeDropdownName }}
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="dataBarangDropdown">
+                        @foreach ($dataBarang as $item)
+                            <li>
+                                <a class="dropdown-item {{ request()->routeIs($item['route']) ? 'active' : '' }}"
+                                   href="{{ route($item['route']) }}">
+                                    {{ $item['name'] }}
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
                 </li>
-            @endif
-        @endforeach
+
+                {{-- Menu khusus admin --}}
+                @foreach ($adminNavs as $nav)
+                    @role($nav['role'])
+                        <li class="nav-item">
+                            <x-nav-link :active="request()->routeIs($nav['route'])" :href="route($nav['route'])">
+                                {{ $nav['name'] }}
+                            </x-nav-link>
+                        </li>
+                    @endrole
+                @endforeach
             </ul>
 
             <!-- Right Side -->

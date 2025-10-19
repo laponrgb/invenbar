@@ -15,14 +15,22 @@ return new class extends Migration
         $table->id();
         $table->string('kode_barang', 50)->unique();
         $table->string('nama_barang', 150);
+
         $table->foreignId('kategori_id')
             ->constrained('kategoris')
             ->onUpdate('cascade')
             ->onDelete('restrict');
+
         $table->foreignId('lokasi_id')
             ->constrained('lokasis')
             ->onUpdate('cascade')
             ->onDelete('restrict');
+
+        $table->foreignId('sumberdana_id')
+            ->constrained('sumberdanas')
+            ->onUpdate('cascade')
+            ->onDelete('restrict');
+
         $table->integer('jumlah')->default(0);
         $table->string('satuan', 20);
         $table->enum('kondisi', ['Baik', 'Rusak Ringan', 'Rusak Berat'])->default('Baik');

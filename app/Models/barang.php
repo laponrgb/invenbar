@@ -13,6 +13,7 @@ class Barang extends Model
         'nama_barang',
         'kategori_id',
         'lokasi_id',
+        'sumberdana_id', // ✅ tambahkan ini
         'satuan',
         'jumlah',
         'jumlah_baik',
@@ -40,6 +41,14 @@ class Barang extends Model
     public function lokasi(): BelongsTo
     {
         return $this->belongsTo(Lokasi::class, 'lokasi_id');
+    }
+
+    /**
+     * Relasi ke Sumber Dana
+     */
+    public function sumberdana(): BelongsTo
+    {
+        return $this->belongsTo(SumberDana::class, 'sumberdana_id');
     }
 
     /**
