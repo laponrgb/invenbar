@@ -20,7 +20,7 @@ class DashboardController extends Controller
         $jumlahKategori = Kategori::count();
         $jumlahLokasi   = Lokasi::count();
         $jumlahUser     = User::count();
-
+        
         // Hitung jumlah per kondisi
         $kondisiBaik        = Barang::sum('jumlah_baik');
         $kondisiRusakRingan = Barang::sum('jumlah_rusak_ringan');

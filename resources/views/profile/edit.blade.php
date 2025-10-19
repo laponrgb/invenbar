@@ -19,11 +19,11 @@
                 </div>
             </div>
 
-            <div class="card shadow-sm mt-4">
+            {{-- <div class="card shadow-sm mt-4">
                 <div class="card-body">
                     @include('profile.partials.delete-user-form')
                 </div>
-            </div>
+            </div> --}}
         </div>
     </div>
 </x-app-layout>

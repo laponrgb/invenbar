@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SumberDanaController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\KategoriController;
@@ -21,6 +22,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('user', UserController::class);
     Route::resource('kategori', KategoriController::class);
     Route::resource('lokasi', LokasiController::class);
+    Route::resource('sumberdana', SumberDanaController::class);
 
     Route::get('/barang/laporan', [BarangController::class, 'cetakLaporan'])
         ->name('barang.laporan');

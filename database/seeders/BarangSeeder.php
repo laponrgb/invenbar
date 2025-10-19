@@ -15,6 +15,7 @@ class BarangSeeder extends Seeder
                 'nama_barang' => 'Laptop Dell Latitude 5420',
                 'kategori_id' => 1,
                 'lokasi_id' => 4,
+                'sumberdana_id' => 1, // ✅ tambahkan sumber dana
                 'jumlah' => 9, // total semua kondisi
                 'satuan' => 'Unit',
                 'jumlah_baik' => 3,
@@ -30,6 +31,7 @@ class BarangSeeder extends Seeder
                 'nama_barang' => 'Proyektor Epson EB-X500',
                 'kategori_id' => 1,
                 'lokasi_id' => 1,
+                'sumberdana_id' => 2, // ✅ tambahkan sumber dana
                 'jumlah' => 2,
                 'satuan' => 'Unit',
                 'jumlah_baik' => 2,
@@ -45,6 +47,7 @@ class BarangSeeder extends Seeder
                 'nama_barang' => 'Meja Rapat Kayu Jati',
                 'kategori_id' => 2,
                 'lokasi_id' => 1,
+                'sumberdana_id' => 3, // ✅ tambahkan sumber dana
                 'jumlah' => 1,
                 'satuan' => 'Buah',
                 'jumlah_baik' => 1,
@@ -60,6 +63,7 @@ class BarangSeeder extends Seeder
                 'nama_barang' => 'Spidol Whiteboard Snowman',
                 'kategori_id' => 3,
                 'lokasi_id' => 3,
+                'sumberdana_id' => 1, // ✅ tambahkan sumber dana
                 'jumlah' => 50,
                 'satuan' => 'Pcs',
                 'jumlah_baik' => 48,

@@ -9,6 +9,7 @@ use Illuminate\Routing\Controllers\Middleware;
 use App\Models\Kategori;
 use App\Models\Lokasi;
 use Illuminate\Support\Facades\Storage;
+use App\Models\SumberDana;
 use Barryvdh\DomPDF\Facade\Pdf; 
 
 class BarangController extends Controller implements HasMiddleware
@@ -25,7 +26,7 @@ class BarangController extends Controller implements HasMiddleware
     {
         $search = $request->search;
 
-        $barangs = Barang::with(['kategori', 'lokasi'])
+        $barangs = Barang::with(['kategori', 'lokasi','sumberdana'])
             ->when($search, function ($query, $search) {
                 $query->where('nama_barang', 'like', '%' . $search . '%')
                       ->orWhere('kode_barang', 'like', '%' . $search . '%');
@@ -41,10 +42,11 @@ class BarangController extends Controller implements HasMiddleware
     {
         $kategori = Kategori::all();
         $lokasi = Lokasi::all();
-
+        $sumberdana = SumberDana::all();
+        
         $barang = new Barang();
 
-        return view('barang.create', compact('barang', 'kategori', 'lokasi'));
+        return view('barang.create', compact('barang', 'kategori', 'lokasi', 'sumberdana'));
     }
 
     /**
@@ -57,6 +59,7 @@ class BarangController extends Controller implements HasMiddleware
             'nama_barang'          => 'required|string|max:150',
             'kategori_id'          => 'required|exists:kategoris,id',
             'lokasi_id'            => 'required|exists:lokasis,id',
+            'sumberdana_id'        => 'required|exists:sumberdanas,id',
             'satuan'               => 'required|string|max:20',
             'jumlah_baik'          => 'required|integer|min:0',
             'jumlah_rusak_ringan'  => 'required|integer|min:0',
@@ -98,8 +101,9 @@ class BarangController extends Controller implements HasMiddleware
     {
         $kategori = Kategori::all();
         $lokasi   = Lokasi::all();
+        $sumberdana = SumberDana::all();
 
-        return view('barang.edit', compact('barang', 'kategori', 'lokasi'));
+        return view('barang.edit', compact('barang', 'kategori', 'lokasi', 'sumberdana'));
     }
 
     /**
@@ -112,6 +116,7 @@ class BarangController extends Controller implements HasMiddleware
             'nama_barang'          => 'required|string|max:150',
             'kategori_id'          => 'required|exists:kategoris,id',
             'lokasi_id'            => 'required|exists:lokasis,id',
+            'sumberdana_id'        => 'required|exists:sumberdanas,id',
             'satuan'               => 'required|string|max:20',
             'jumlah_baik'          => 'required|integer|min:0',
             'jumlah_rusak_ringan'  => 'required|integer|min:0',

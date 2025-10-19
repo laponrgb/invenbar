@@ -6,6 +6,7 @@
             <th>Nama Barang</th>
             <th>Kategori</th>
             <th>Lokasi</th>
+            <th>Sumber Dana</th>
             <th>Jumlah</th>
             <th>Kondisi</th>
             <th>&nbsp;</th>
@@ -19,6 +20,7 @@
             <td>{{ $barang->nama_barang }}</td>
             <td>{{ $barang->kategori->nama_kategori }}</td>
             <td>{{ $barang->lokasi->nama_lokasi }}</td>
+             <td>{{ $barang->sumberdana->nama_sumberdana ?? '-' }}</td>
             <td>{{ $barang->jumlah }} {{ $barang->satuan }}</td>
 
             <td>

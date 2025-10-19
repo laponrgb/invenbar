@@ -13,5 +13,4 @@ class lokasi extends Model
     {
         return $this->hasMany(Barang::class, 'lokasi_id');
     }
-
 }
