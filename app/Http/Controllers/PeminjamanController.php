@@ -18,10 +18,48 @@ class PeminjamanController extends Controller
         
         return $kode;
     }
-    public function index()
+    public function index(Request $request)
     {
-        $peminjamans = Peminjaman::with('details.barang')->latest()->paginate(10);
-        return view('peminjaman.index', compact('peminjamans'));
+        $query = Peminjaman::with('details.barang');
+
+        // Filter berdasarkan pencarian nama peminjam atau kode peminjaman
+        if ($request->filled('search')) {
+            $searchTerm = $request->search;
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('nama_peminjam', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('kode_peminjaman', 'like', '%' . $searchTerm . '%');
+            });
+        }
+
+        // Filter berdasarkan status
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        // Filter berdasarkan tanggal pinjam
+        if ($request->filled('tanggal_pinjam')) {
+            $query->whereDate('tanggal_pinjam', $request->tanggal_pinjam);
+        }
+
+        // Filter berdasarkan tanggal kembali
+        if ($request->filled('tanggal_kembali')) {
+            $query->whereDate('tanggal_kembali', $request->tanggal_kembali);
+        }
+
+        // Filter berdasarkan lokasi barang yang dipinjam
+        if ($request->filled('lokasi_id')) {
+            $query->whereHas('details.barang', function ($q) use ($request) {
+                $q->where('lokasi_id', $request->lokasi_id);
+            });
+        }
+
+
+        $peminjamans = $query->latest()->paginate(10)->withQueryString();
+        
+        // Ambil data untuk dropdown filter dengan lokasi
+        $barangs = Barang::with('lokasi')->orderBy('nama_barang')->get();
+        
+        return view('peminjaman.index', compact('peminjamans', 'barangs'));
     }
 
     public function create()
