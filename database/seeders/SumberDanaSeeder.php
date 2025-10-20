@@ -13,26 +13,9 @@ class SumberDanaSeeder extends Seeder
     public function run(): void
     {
         DB::table('sumberdanas')->insert([
-            [
-                'nama_sumberdana' => 'APBN',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'nama_sumberdana' => 'APBD',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'nama_sumberdana' => 'BOS',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
-            [
-                'nama_sumberdana' => 'Donasi Sekolah',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
+            ['nama_sumberdana' => 'Dana BOS', 'created_at' => now(), 'updated_at' => now()],
+            ['nama_sumberdana' => 'Komite Sekolah', 'created_at' => now(), 'updated_at' => now()],
+            ['nama_sumberdana' => 'Bantuan Pemerintah', 'created_at' => now(), 'updated_at' => now()],
         ]);
     }
 }
