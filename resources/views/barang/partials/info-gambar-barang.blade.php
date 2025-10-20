@@ -1,6 +1,6 @@
 @if ($barang->gambar)
     <img 
-        src="{{ asset('gambar-barang/' . $barang->gambar) }}" 
+        src="{{ asset('storage/gambar-barang/' . $barang->gambar) }}" 
         class="img-fluid rounded border"
         alt="{{ $barang->nama_barang }}" 
         style="max-height: 300px;"
