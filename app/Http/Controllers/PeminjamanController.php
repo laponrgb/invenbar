@@ -26,7 +26,7 @@ class PeminjamanController extends Controller
 
     public function create()
     {
-        $barangs = Barang::where('jumlah_baik', '>', 0)->get();
+        $barangs = Barang::with('lokasi')->where('jumlah_baik', '>', 0)->get();
         return view('peminjaman.create', compact('barangs'));
     }
 
@@ -85,7 +85,7 @@ class PeminjamanController extends Controller
             $reserved[$detail->barang_id] = ($reserved[$detail->barang_id] ?? 0) + $detail->jumlah;
         }
 
-        $barangs = Barang::orderBy('nama_barang')->get();
+        $barangs = Barang::with('lokasi')->orderBy('nama_barang')->get();
 
         // tambahkan properti available (tidak disimpan ke DB)
         foreach ($barangs as $barang) {

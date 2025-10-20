@@ -38,7 +38,7 @@
 <h6>Barang yang Dipinjam</h6>
 
 @php
-    $jsonBarangs = $barangs->map(fn($b) => ['id'=>$b->id,'nama'=>$b->nama_barang,'stok'=>$b->jumlah_baik]);
+    $jsonBarangs = $barangs->map(fn($b) => ['id'=>$b->id,'nama'=>$b->nama_barang,'stok'=>$b->jumlah_baik,'lokasi'=>$b->lokasi->nama_lokasi ?? 'Tidak ada lokasi']);
 @endphp
 
 <div id="barang-list">
@@ -120,7 +120,7 @@ function clearError(input){input.classList.remove('is-invalid'); const err=input
 
 function setupAutocomplete(input){
     const list=input.closest('.col-md-6').querySelector('.autocomplete-list');
-    input.addEventListener('input',()=>{const val=input.value.toLowerCase().trim(); const row=input.closest('.barang-row'); const currentId=row.querySelector('input[name="barang_id[]"]').value; const selected=Array.from(document.querySelectorAll('input[name="barang_id[]"]')).map(i=>i.value).filter(v=>v && v!==currentId); list.innerHTML=''; if(!val)return list.style.display='none'; const filtered=barangs.filter(b=>b.nama.toLowerCase().includes(val) && !selected.includes(String(b.id))); if(!filtered.length)return list.style.display='none'; list.style.position='absolute'; list.style.top=`${input.offsetTop+input.offsetHeight}px`; list.style.left=`${input.offsetLeft}px`; list.style.width=`${input.offsetWidth}px`; list.style.display='block'; filtered.forEach(b=>{const item=document.createElement('div'); item.className='autocomplete-item'; item.textContent=`${b.nama} (Stok: ${b.stok})`; item.addEventListener('mousedown',()=>{input.value=b.nama; row.querySelector('input[name="barang_id[]"]').value=b.id; const j=row.querySelector('.jumlah-input'); j.max=b.stok; if(j.value>b.stok) j.value=b.stok; list.innerHTML=''; list.style.display='none';}); list.appendChild(item);});});
+    input.addEventListener('input',()=>{const val=input.value.toLowerCase().trim(); const row=input.closest('.barang-row'); const currentId=row.querySelector('input[name="barang_id[]"]').value; const selected=Array.from(document.querySelectorAll('input[name="barang_id[]"]')).map(i=>i.value).filter(v=>v && v!==currentId); list.innerHTML=''; if(!val)return list.style.display='none'; const filtered=barangs.filter(b=>b.nama.toLowerCase().includes(val) && !selected.includes(String(b.id))); if(!filtered.length)return list.style.display='none'; list.style.position='absolute'; list.style.top=`${input.offsetTop+input.offsetHeight}px`; list.style.left=`${input.offsetLeft}px`; list.style.width=`${input.offsetWidth}px`; list.style.display='block'; filtered.forEach(b=>{const item=document.createElement('div'); item.className='autocomplete-item'; item.textContent=`${b.nama} (Stok: ${b.stok}) (${b.lokasi})`; item.addEventListener('mousedown',()=>{input.value=b.nama; row.querySelector('input[name="barang_id[]"]').value=b.id; const j=row.querySelector('.jumlah-input'); j.max=b.stok; if(j.value>b.stok) j.value=b.stok; list.innerHTML=''; list.style.display='none';}); list.appendChild(item);});});
     input.addEventListener('blur',()=>setTimeout(()=>{list.innerHTML=''; list.style.display='none';},150));
 }
 

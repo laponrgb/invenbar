@@ -25,17 +25,48 @@ class BarangController extends Controller implements HasMiddleware
     public function index(Request $request)
     {
         $search = $request->search;
+        $kategori_id = $request->kategori_id;
+        $sumberdana_id = $request->sumberdana_id;
+        $kondisi = $request->kondisi;
 
         $barangs = Barang::with(['kategori', 'lokasi','sumberdana'])
             ->when($search, function ($query, $search) {
                 $query->where('nama_barang', 'like', '%' . $search . '%')
                       ->orWhere('kode_barang', 'like', '%' . $search . '%');
             })
+            ->when($kategori_id, function ($query, $kategori_id) {
+                $query->where('kategori_id', $kategori_id);
+            })
+            ->when($sumberdana_id, function ($query, $sumberdana_id) {
+                $query->where('sumberdana_id', $sumberdana_id);
+            })
+            ->when($kondisi, function ($query, $kondisi) {
+                switch ($kondisi) {
+                    case 'baik':
+                        $query->where('jumlah_baik', '>', 0);
+                        break;
+                    case 'rusak_ringan':
+                        $query->where('jumlah_rusak_ringan', '>', 0);
+                        break;
+                    case 'rusak_berat':
+                        $query->where('jumlah_rusak_berat', '>', 0);
+                        break;
+                    case 'kosong':
+                        $query->where('jumlah_baik', 0)
+                              ->where('jumlah_rusak_ringan', 0)
+                              ->where('jumlah_rusak_berat', 0);
+                        break;
+                }
+            })
             ->latest()
             ->paginate()
             ->withQueryString();
 
-        return view('barang.index', compact('barangs', 'search'));
+        // Get filter options
+        $kategoris = Kategori::orderBy('nama_kategori')->get();
+        $sumberdanas = SumberDana::orderBy('nama_sumberdana')->get();
+
+        return view('barang.index', compact('barangs', 'search', 'kategori_id', 'sumberdana_id', 'kondisi', 'kategoris', 'sumberdanas'));
     }
 
     public function create()
