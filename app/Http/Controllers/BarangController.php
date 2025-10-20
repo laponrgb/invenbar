@@ -8,9 +8,9 @@ use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use App\Models\Kategori;
 use App\Models\Lokasi;
-use Illuminate\Support\Facades\Storage;
 use App\Models\SumberDana;
-use Barryvdh\DomPDF\Facade\Pdf; 
+use Illuminate\Support\Facades\Storage;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class BarangController extends Controller implements HasMiddleware
 {
@@ -26,13 +26,13 @@ class BarangController extends Controller implements HasMiddleware
     {
         $search = $request->search;
 
-        $barangs = Barang::with(['kategori', 'lokasi','sumberdana'])
+        $barangs = Barang::with(['kategori', 'lokasi', 'sumberdana'])
             ->when($search, function ($query, $search) {
-                $query->where('nama_barang', 'like', '%' . $search . '%')
-                      ->orWhere('kode_barang', 'like', '%' . $search . '%');
+                $query->where('nama_barang', 'like', "%$search%")
+                      ->orWhere('kode_barang', 'like', "%$search%");
             })
             ->latest()
-            ->paginate()
+            ->paginate(10)
             ->withQueryString();
 
         return view('barang.index', compact('barangs', 'search'));
@@ -43,15 +43,11 @@ class BarangController extends Controller implements HasMiddleware
         $kategori = Kategori::all();
         $lokasi = Lokasi::all();
         $sumberdana = SumberDana::all();
-        
         $barang = new Barang();
 
         return view('barang.create', compact('barang', 'kategori', 'lokasi', 'sumberdana'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -68,47 +64,38 @@ class BarangController extends Controller implements HasMiddleware
             'gambar'               => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $validated['jumlah'] = 
+        // Hitung total jumlah
+        $validated['jumlah'] =
             ($validated['jumlah_baik'] ?? 0) +
             ($validated['jumlah_rusak_ringan'] ?? 0) +
             ($validated['jumlah_rusak_berat'] ?? 0);
 
+        // Upload gambar (jika ada)
         if ($request->hasFile('gambar')) {
-            $validated['gambar'] = $request->file('gambar')->store(null, 'gambar-barang');
+            $validated['gambar'] = $request->file('gambar')->store('', 'gambar-barang');
         }
 
         Barang::create($validated);
 
-        return redirect()
-            ->route('barang.index')
+        return redirect()->route('barang.index')
             ->with('success', 'Data barang berhasil ditambahkan.');
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Barang $barang)
     {
-        $barang->load(['kategori', 'lokasi']);
-
+        $barang->load(['kategori', 'lokasi', 'sumberdana']);
         return view('barang.show', compact('barang'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Barang $barang)
     {
         $kategori = Kategori::all();
-        $lokasi   = Lokasi::all();
+        $lokasi = Lokasi::all();
         $sumberdana = SumberDana::all();
 
         return view('barang.edit', compact('barang', 'kategori', 'lokasi', 'sumberdana'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Barang $barang)
     {
         $validated = $request->validate([
@@ -125,28 +112,26 @@ class BarangController extends Controller implements HasMiddleware
             'gambar'               => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $validated['jumlah'] = 
+        $validated['jumlah'] =
             ($validated['jumlah_baik'] ?? 0) +
             ($validated['jumlah_rusak_ringan'] ?? 0) +
             ($validated['jumlah_rusak_berat'] ?? 0);
 
         if ($request->hasFile('gambar')) {
+            // Hapus gambar lama
             if ($barang->gambar) {
                 Storage::disk('gambar-barang')->delete($barang->gambar);
             }
-            $validated['gambar'] = $request->file('gambar')->store(null, 'gambar-barang');
+            // Simpan gambar baru
+            $validated['gambar'] = $request->file('gambar')->store('', 'gambar-barang');
         }
 
         $barang->update($validated);
 
-        return redirect()
-            ->route('barang.index')
+        return redirect()->route('barang.index')
             ->with('success', 'Data barang berhasil diperbarui.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Barang $barang)
     {
         if ($barang->gambar) {
@@ -155,23 +140,21 @@ class BarangController extends Controller implements HasMiddleware
 
         $barang->delete();
 
-        return redirect()
-            ->route('barang.index')
+        return redirect()->route('barang.index')
             ->with('success', 'Data barang berhasil dihapus.');
     }
-    
+
     public function cetakLaporan()
     {
-        $barangs = Barang::with(['kategori', 'lokasi'])->get();
+        $barangs = Barang::with(['kategori', 'lokasi', 'sumberdana'])->get();
 
         $data = [
             'title' => 'Laporan Data Barang Inventaris',
-            'date' => date('d F Y'),
+            'date'  => date('d F Y'),
             'barangs' => $barangs,
         ];
 
         $pdf = Pdf::loadView('barang.laporan', $data);
-
         return $pdf->stream('laporan-inventaris-barang.pdf');
     }
 }
