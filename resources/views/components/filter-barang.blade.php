@@ -38,6 +38,19 @@
             </select>
         </div>
 
+        <!-- Lokasi Filter -->
+        <div class="col-md-2">
+            <label class="form-label">Lokasi</label>
+            <select name="lokasi_id" class="form-select">
+                <option value="">Semua Lokasi</option>
+                @foreach(($lokasis ?? collect()) as $lokasi)
+                    <option value="{{ $lokasi->id }}" {{ request('lokasi_id') == $lokasi->id ? 'selected' : '' }}>
+                        {{ $lokasi->nama_lokasi }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+
         <!-- Kondisi Filter -->
         <div class="col-md-2">
             <label class="form-label">Kondisi</label>
@@ -62,7 +75,7 @@
     </div>
 
     <!-- Active Filters Display -->
-    @if(request('search') || request('kategori_id') || request('sumberdana_id') || request('kondisi'))
+    @if(request('search') || request('kategori_id') || request('sumberdana_id') || request('lokasi_id') || request('kondisi'))
         <div class="mt-3">
             <div class="d-flex flex-wrap gap-2 align-items-center">
                 <span class="text-muted small">Filter Aktif:</span>
@@ -84,6 +97,13 @@
                     <span class="badge bg-success">
                         <i class="bi bi-currency-dollar"></i> {{ $selectedSumberdana->nama_sumberdana ?? 'Sumber Dana' }}
                         <a href="{{ request()->fullUrlWithQuery(['sumberdana_id' => null]) }}" class="text-white ms-1">×</a>
+                    </span>
+                @endif
+                @if(request('lokasi_id'))
+                    @php $selectedLokasi = ($lokasis ?? collect())->firstWhere('id', request('lokasi_id')); @endphp
+                    <span class="badge bg-secondary">
+                        <i class="bi bi-geo"></i> {{ $selectedLokasi->nama_lokasi ?? 'Lokasi' }}
+                        <a href="{{ request()->fullUrlWithQuery(['lokasi_id' => null]) }}" class="text-white ms-1">×</a>
                     </span>
                 @endif
                 @if(request('kondisi'))

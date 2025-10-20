@@ -12,6 +12,6 @@
         </h6>
     </div>
     <div class="card-body">
-        <x-filter-barang :kategoris="$kategoris" :sumberdanas="$sumberdanas" />
+        <x-filter-barang :kategoris="$kategoris" :sumberdanas="$sumberdanas" :lokasis="$lokasis" />
     </div>
 </div>

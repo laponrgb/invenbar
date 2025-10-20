@@ -28,6 +28,7 @@ class BarangController extends Controller implements HasMiddleware
         $kategori_id = $request->kategori_id;
         $sumberdana_id = $request->sumberdana_id;
         $kondisi = $request->kondisi;
+        $lokasi_id = $request->lokasi_id;
 
         $barangs = Barang::with(['kategori', 'lokasi', 'sumberdana'])
             ->when($search, function ($query, $search) {
@@ -39,6 +40,9 @@ class BarangController extends Controller implements HasMiddleware
             })
             ->when($sumberdana_id, function ($query, $sumberdana_id) {
                 $query->where('sumberdana_id', $sumberdana_id);
+            })
+            ->when($lokasi_id, function ($query, $lokasi_id) {
+                $query->where('lokasi_id', $lokasi_id);
             })
             ->when($kondisi, function ($query, $kondisi) {
                 switch ($kondisi) {
@@ -65,8 +69,9 @@ class BarangController extends Controller implements HasMiddleware
         // Get filter options
         $kategoris = Kategori::orderBy('nama_kategori')->get();
         $sumberdanas = SumberDana::orderBy('nama_sumberdana')->get();
+        $lokasis = Lokasi::orderBy('nama_lokasi')->get();
 
-        return view('barang.index', compact('barangs', 'search', 'kategori_id', 'sumberdana_id', 'kondisi', 'kategoris', 'sumberdanas'));
+        return view('barang.index', compact('barangs', 'search', 'kategori_id', 'sumberdana_id', 'kondisi', 'lokasi_id', 'kategoris', 'sumberdanas', 'lokasis'));
     }
 
     public function create()
