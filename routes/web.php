@@ -31,7 +31,6 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('peminjaman', PeminjamanController::class);
     Route::patch('peminjaman/{peminjaman}/return', [PeminjamanController::class, 'return'])->name('peminjaman.return');
-    Route::patch('peminjaman/{peminjaman}/undo', [PeminjamanController::class, 'undoReturn'])->name('peminjaman.undo');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

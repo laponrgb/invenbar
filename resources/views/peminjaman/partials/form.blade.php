@@ -1,10 +1,11 @@
-@if(isset($peminjaman) && $peminjaman->kode_peminjaman)
 <div class="row mb-3">
     <div class="col-md-12">
-        <x-form-input label="Kode Peminjaman" name="kode_peminjaman" :value="$peminjaman->kode_peminjaman" readonly />
+        <x-form-input label="Kode Peminjaman" name="kode_peminjaman" 
+            :value="$peminjaman->kode_peminjaman ?? 'Akan dibuat otomatis'" 
+            :readonly="true" 
+            :disabled="true" />
     </div>
 </div>
-@endif
 
 <div class="row mb-3">
     <div class="col-md-4">
@@ -54,7 +55,7 @@
         <div class="col-md-4">
             <label>Jumlah</label>
             <input type="number" name="jumlah[]" class="form-control jumlah-input"
-                min="1" max="{{ $detail->barang->jumlah_baik ?? 1 }}" value="{{ $detail->jumlah }}" required>
+                min="0" max="{{ $detail->barang->jumlah_baik ?? 1 }}" value="{{ $detail->jumlah }}" required>
             <small class="text-danger error-message" data-for="jumlah[]"></small>
         </div>
         <div class="col-md-2 d-flex align-items-end">
@@ -73,7 +74,7 @@
         </div>
         <div class="col-md-4">
             <label>Jumlah</label>
-            <input type="number" name="jumlah[]" class="form-control jumlah-input" min="1" value="1" required>
+            <input type="number" name="jumlah[]" class="form-control jumlah-input" min="0" value="1" required>
             <small class="text-danger error-message" data-for="jumlah[]"></small>
         </div>
         <div class="col-md-2 d-flex align-items-end">
@@ -105,7 +106,7 @@ function createRow(data={}) {
     </div>
     <div class="col-md-4">
         <label>Jumlah</label>
-        <input type="number" name="jumlah[]" class="form-control jumlah-input" min="1" max="${data.stok??1}" value="${data.jumlah??1}" required>
+        <input type="number" name="jumlah[]" class="form-control jumlah-input" min="0" max="${data.stok??1}" value="${data.jumlah??1}" required>
         <small class="text-danger error-message" data-for="jumlah[]"></small>
     </div>
     <div class="col-md-2 d-flex align-items-end">
@@ -144,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 document.getElementById('btn-tambah-row').addEventListener('click',()=>createRow());
 document.addEventListener('click',e=>{if(e.target.classList.contains('btn-hapus-row')){if(barangList.children.length>1)e.target.closest('.barang-row').remove();else highlightError(barangList.querySelector('.barang-input'),"Minimal satu barang harus dipinjam.");}});
-document.addEventListener('input',e=>{if(e.target.classList.contains('jumlah-input')){const max=parseInt(e.target.max||1),min=parseInt(e.target.min||1),val=parseInt(e.target.value); if(val>max)e.target.value=max; if(val<min||isNaN(val))e.target.value=min;}});
+document.addEventListener('input',e=>{if(e.target.classList.contains('jumlah-input')){const max=parseInt(e.target.max||1),min=parseInt(e.target.min||0),val=parseInt(e.target.value); if(val>max)e.target.value=max; if(val<min||isNaN(val))e.target.value=min;}});
 
 document.getElementById('btn-submit').addEventListener('click',e=>{
     let valid=true; document.querySelectorAll('.form-control').forEach(clearError);

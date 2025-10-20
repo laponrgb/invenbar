@@ -153,12 +153,14 @@ class PeminjamanController extends Controller
             }
 
             // 5) Update data peminjaman
-            $peminjaman->update($request->only([
+            $peminjaman->update(array_merge($request->only([
                 'nama_peminjam',
                 'telepon_peminjam',
                 'email_peminjam',
                 'tanggal_pinjam',
                 'tanggal_kembali',
+            ]), [
+                'status' => 'Dipinjam'
             ]));
 
             // 6) Reset detail dan masukkan detail baru sesuai $newQtyMap
@@ -191,21 +193,6 @@ class PeminjamanController extends Controller
         return back()->with('success', 'Barang berhasil dikembalikan.');
     }
 
-    public function undoReturn(Peminjaman $peminjaman)
-    {
-        foreach ($peminjaman->details as $detail) {
-            $barang = $detail->barang;
-            if ($barang && $barang->jumlah_baik >= $detail->jumlah) {
-                $barang->decrement('jumlah_baik', $detail->jumlah);
-            }
-        }
-
-        $peminjaman->update([
-            'status' => 'Dipinjam',
-            'tanggal_kembali' => null
-        ]);
-        return back()->with('success', 'Pengembalian barang dibatalkan.');
-    }
 
     public function destroy(Peminjaman $peminjaman)
     {
