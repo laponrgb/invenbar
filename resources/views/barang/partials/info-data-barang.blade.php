@@ -17,6 +17,10 @@
             <td>{{ $barang->jumlah }} {{ $barang->satuan }}</td>
         </tr>
         <tr>
+            <th>Sumber Dana</th>
+            <td>{{ $barang->sumberdana->nama_sumberdana ?? '-' }}</td>
+        </tr>
+        <tr>
             <th>Kondisi</th>
             <td>
                 @php
@@ -46,18 +50,7 @@
                     @endif
                 </div>
 
-                {{-- Progress bar kondisi --}}
-                <div class="progress" style="height: 12px;">
-                    @if ($barang->jumlah_baik > 0)
-                        <div class="progress-bar bg-success" style="width: {{ $baik }}%"></div>
-                    @endif
-                    @if ($barang->jumlah_rusak_ringan > 0)
-                        <div class="progress-bar bg-warning" style="width: {{ $ringan }}%"></div>
-                    @endif
-                    @if ($barang->jumlah_rusak_berat > 0)
-                        <div class="progress-bar bg-danger" style="width: {{ $berat }}%"></div>
-                    @endif
-                {{-- </div> --}}
+                {{-- Progress bar dihilangkan sesuai permintaan --}}
             </td>
         </tr>
         <tr>
