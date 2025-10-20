@@ -18,10 +18,10 @@
                 // Tentukan badge class berdasarkan waktu
                 if ($sisaMenit < 0) {
                     $badgeClass = 'bg-danger';
-                    $badgeText = 'Terlambat ' . abs(round($sisaMenit / 60)) . ' jam';
+                    $badgeText = 'Sisa waktu ' . abs(round($sisaMenit / 60)) . ' jam';
                 } elseif ($sisaMenit < 60) {
                     $badgeClass = 'bg-danger';
-                    $badgeText = 'Terlambat ' . abs(round($sisaMenit)) . ' menit';
+                    $badgeText = 'Sisa waktu ' . abs(round($sisaMenit)) . ' menit';
                 } elseif ($sisaMenit < 1440) { // kurang dari 1 hari (24 jam)
                     $badgeClass = $sisaMenit < 120 ? 'bg-danger' : 'bg-warning text-dark';
                     $jam = round($sisaMenit / 60);
