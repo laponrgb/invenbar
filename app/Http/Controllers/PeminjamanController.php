@@ -237,4 +237,31 @@ class PeminjamanController extends Controller
         $peminjaman->delete();
         return back()->with('success', 'Data peminjaman berhasil dihapus.');
     }
+
+    public function extendForm(Peminjaman $peminjaman)
+    {
+        // Hanya tampilkan form jika masih Dipinjam
+        if ($peminjaman->status !== 'Dipinjam') {
+            return redirect()->route('peminjaman.index')->with('error', 'Peminjaman tidak dapat diperpanjang.');
+        }
+
+        return view('peminjaman.extend', compact('peminjaman'));
+    }
+
+    public function extend(Request $request, Peminjaman $peminjaman)
+    {
+        if ($peminjaman->status !== 'Dipinjam') {
+            return redirect()->route('peminjaman.index')->with('error', 'Peminjaman tidak dapat diperpanjang.');
+        }
+
+        $request->validate([
+            'tanggal_kembali' => 'required|date|after_or_equal:' . $peminjaman->tanggal_pinjam,
+        ]);
+
+        $peminjaman->update([
+            'tanggal_kembali' => $request->tanggal_kembali,
+        ]);
+
+        return redirect()->route('peminjaman.index')->with('success', 'Tanggal kembali berhasil diperpanjang.');
+    }
 }

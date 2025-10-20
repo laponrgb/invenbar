@@ -31,6 +31,8 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('peminjaman', PeminjamanController::class);
     Route::patch('peminjaman/{peminjaman}/return', [PeminjamanController::class, 'return'])->name('peminjaman.return');
+    Route::get('peminjaman/{peminjaman}/extend', [PeminjamanController::class, 'extendForm'])->name('peminjaman.extend.form');
+    Route::patch('peminjaman/{peminjaman}/extend', [PeminjamanController::class, 'extend'])->name('peminjaman.extend');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

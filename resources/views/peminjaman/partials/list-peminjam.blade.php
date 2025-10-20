@@ -62,6 +62,18 @@
                     <x-tombol-aksi href="{{ route('peminjaman.return', $peminjaman->id) }}" type="return" />
                 @endif
 
+                {{-- Perpanjang jika lewat tanggal kembali dan masih Dipinjam --}}
+                @php
+                    $isOverdue = $peminjaman->status == 'Dipinjam' 
+                        && $peminjaman->tanggal_kembali 
+                        && $peminjaman->tanggal_kembali < date('Y-m-d');
+                @endphp
+                @if($isOverdue)
+                    <a href="{{ route('peminjaman.extend.form', $peminjaman->id) }}" class="btn btn-sm btn-outline-primary ms-1">
+                        <i class="bi bi-calendar-plus"></i> Perpanjang
+                    </a>
+                @endif
+
                 {{-- Hanya tampilkan tombol edit & delete jika status bukan "Dipinjam" --}}
                 @if($peminjaman->status != 'Dipinjam')
                     <x-tombol-aksi href="{{ route('peminjaman.edit', $peminjaman->id) }}" type="edit" />
