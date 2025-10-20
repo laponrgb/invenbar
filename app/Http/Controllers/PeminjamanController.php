@@ -31,7 +31,7 @@ class PeminjamanController extends Controller
     }
 
     public function store(Request $request)
-    {
+    {   
         $request->validate([
             'nama_peminjam' => 'required|string|max:255',
             'telepon_peminjam' => 'required|string|max:20',
