@@ -159,7 +159,7 @@ document.getElementById('btn-submit').addEventListener('click',e=>{
         valid = false;
     }
     
-    document.querySelectorAll('.barang-row').forEach(row=>{const nama=row.querySelector('.barang-input'),id=row.querySelector('input[name="barang_id[]"]'),jumlah=row.querySelector('.jumlah-input'),stok=parseInt(jumlah.max||1); if(!nama.value.trim()||!id.value.trim()){highlightError(nama,"Pilih barang dari daftar"); valid=false;} if(jumlah.value<1||jumlah.value>stok){highlightError(jumlah,`Jumlah antara 1 - ${stok}`); valid=false;}});
+    document.querySelectorAll('.barang-row').forEach(row=>{const nama=row.querySelector('.barang-input'),id=row.querySelector('input[name="barang_id[]"]'),jumlah=row.querySelector('.jumlah-input'),stok=parseInt(jumlah.max||1); if(!nama.value.trim()||!id.value.trim()){highlightError(nama,"Pilih barang dari daftar"); valid=false;} if(jumlah.value<0||jumlah.value>stok){highlightError(jumlah,`Jumlah antara 0 - ${stok}`); valid=false;}});
     if(!valid)e.preventDefault();
 });
 </script>
