@@ -8,6 +8,7 @@ use App\Models\Kategori;
 use App\Models\Lokasi;
 use App\Models\User;
 use App\Models\Peminjaman;
+use App\Models\SumberDana;
 
 class DashboardController extends Controller
 {
@@ -19,6 +20,8 @@ class DashboardController extends Controller
         $jumlahKategori = Kategori::count();
         $jumlahLokasi   = Lokasi::count();
         $jumlahUser     = User::count();
+        $jumlahSumberDana = SumberDana::count();
+        $jumlahPeminjaman = Peminjaman::count();
         
         // Hitung jumlah per kondisi
         $kondisiBaik        = Barang::sum('jumlah_baik');
@@ -52,6 +55,8 @@ class DashboardController extends Controller
             'jumlahKategori',
             'jumlahLokasi',
             'jumlahUser',
+            'jumlahSumberDana',
+            'jumlahPeminjaman',
             'kondisiBaik',
             'kondisiRusakRingan',
             'kondisiRusakBerat',

@@ -57,11 +57,9 @@
             </td>
 
             <td class="text-end">
-                {{-- Tombol Return / Undo tergantung status --}}
+                {{-- Tombol Return --}}
                 @if($peminjaman->status == 'Dipinjam')
                     <x-tombol-aksi href="{{ route('peminjaman.return', $peminjaman->id) }}" type="return" />
-                @elseif($peminjaman->status == 'Dikembalikan')
-                    <x-tombol-aksi href="{{ route('peminjaman.undo', $peminjaman->id) }}" type="undo" />
                 @endif
 
                 {{-- Hanya tampilkan tombol edit & delete jika status bukan "Dipinjam" --}}

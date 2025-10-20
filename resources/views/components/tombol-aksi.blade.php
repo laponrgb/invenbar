@@ -30,13 +30,4 @@
         </form>
         @break
 
-    @case('undo')
-        <form action="{{ $href }}" method="POST" class="d-inline">
-            @csrf
-            @method('PATCH')
-            <button type="submit" class="btn btn-sm btn-secondary" title="Batalkan Pengembalian">
-                <i class="bi bi-arrow-counterclockwise"></i>
-            </button>
-        </form>
-        @break
 @endswitch

@@ -1,10 +1,11 @@
-@if(isset($peminjaman) && $peminjaman->kode_peminjaman)
 <div class="row mb-3">
     <div class="col-md-12">
-        <x-form-input label="Kode Peminjaman" name="kode_peminjaman" :value="$peminjaman->kode_peminjaman" readonly />
+        <x-form-input label="Kode Peminjaman" name="kode_peminjaman" 
+            :value="$peminjaman->kode_peminjaman ?? 'Akan dibuat otomatis'" 
+            :readonly="true" 
+            :disabled="true" />
     </div>
 </div>
-@endif
 
 <div class="row mb-3">
     <div class="col-md-4">
@@ -37,7 +38,7 @@
 <h6>Barang yang Dipinjam</h6>
 
 @php
-    $jsonBarangs = $barangs->map(fn($b) => ['id'=>$b->id,'nama'=>$b->nama_barang,'stok'=>$b->jumlah_baik]);
+    $jsonBarangs = $barangs->map(fn($b) => ['id'=>$b->id,'nama'=>$b->nama_barang,'stok'=>$b->jumlah_baik,'lokasi'=>$b->lokasi->nama_lokasi ?? 'Tidak ada lokasi']);
 @endphp
 
 <div id="barang-list">
@@ -54,7 +55,7 @@
         <div class="col-md-4">
             <label>Jumlah</label>
             <input type="number" name="jumlah[]" class="form-control jumlah-input"
-                min="1" max="{{ $detail->barang->jumlah_baik ?? 1 }}" value="{{ $detail->jumlah }}" required>
+                min="0" max="{{ $detail->barang->jumlah_baik ?? 1 }}" value="{{ $detail->jumlah }}" required>
             <small class="text-danger error-message" data-for="jumlah[]"></small>
         </div>
         <div class="col-md-2 d-flex align-items-end">
@@ -73,7 +74,7 @@
         </div>
         <div class="col-md-4">
             <label>Jumlah</label>
-            <input type="number" name="jumlah[]" class="form-control jumlah-input" min="1" value="1" required>
+            <input type="number" name="jumlah[]" class="form-control jumlah-input" min="0" value="1" required>
             <small class="text-danger error-message" data-for="jumlah[]"></small>
         </div>
         <div class="col-md-2 d-flex align-items-end">
@@ -105,7 +106,7 @@ function createRow(data={}) {
     </div>
     <div class="col-md-4">
         <label>Jumlah</label>
-        <input type="number" name="jumlah[]" class="form-control jumlah-input" min="1" max="${data.stok??1}" value="${data.jumlah??1}" required>
+        <input type="number" name="jumlah[]" class="form-control jumlah-input" min="0" max="${data.stok??1}" value="${data.jumlah??1}" required>
         <small class="text-danger error-message" data-for="jumlah[]"></small>
     </div>
     <div class="col-md-2 d-flex align-items-end">
@@ -119,7 +120,7 @@ function clearError(input){input.classList.remove('is-invalid'); const err=input
 
 function setupAutocomplete(input){
     const list=input.closest('.col-md-6').querySelector('.autocomplete-list');
-    input.addEventListener('input',()=>{const val=input.value.toLowerCase().trim(); const row=input.closest('.barang-row'); const currentId=row.querySelector('input[name="barang_id[]"]').value; const selected=Array.from(document.querySelectorAll('input[name="barang_id[]"]')).map(i=>i.value).filter(v=>v && v!==currentId); list.innerHTML=''; if(!val)return list.style.display='none'; const filtered=barangs.filter(b=>b.nama.toLowerCase().includes(val) && !selected.includes(String(b.id))); if(!filtered.length)return list.style.display='none'; list.style.position='absolute'; list.style.top=`${input.offsetTop+input.offsetHeight}px`; list.style.left=`${input.offsetLeft}px`; list.style.width=`${input.offsetWidth}px`; list.style.display='block'; filtered.forEach(b=>{const item=document.createElement('div'); item.className='autocomplete-item'; item.textContent=`${b.nama} (Stok: ${b.stok})`; item.addEventListener('mousedown',()=>{input.value=b.nama; row.querySelector('input[name="barang_id[]"]').value=b.id; const j=row.querySelector('.jumlah-input'); j.max=b.stok; if(j.value>b.stok) j.value=b.stok; list.innerHTML=''; list.style.display='none';}); list.appendChild(item);});});
+    input.addEventListener('input',()=>{const val=input.value.toLowerCase().trim(); const row=input.closest('.barang-row'); const currentId=row.querySelector('input[name="barang_id[]"]').value; const selected=Array.from(document.querySelectorAll('input[name="barang_id[]"]')).map(i=>i.value).filter(v=>v && v!==currentId); list.innerHTML=''; if(!val)return list.style.display='none'; const filtered=barangs.filter(b=>b.nama.toLowerCase().includes(val) && !selected.includes(String(b.id))); if(!filtered.length)return list.style.display='none'; list.style.position='absolute'; list.style.top=`${input.offsetTop+input.offsetHeight}px`; list.style.left=`${input.offsetLeft}px`; list.style.width=`${input.offsetWidth}px`; list.style.display='block'; filtered.forEach(b=>{const item=document.createElement('div'); item.className='autocomplete-item'; item.textContent=`${b.nama} (Stok: ${b.stok}) (${b.lokasi})`; item.addEventListener('mousedown',()=>{input.value=b.nama; row.querySelector('input[name="barang_id[]"]').value=b.id; const j=row.querySelector('.jumlah-input'); j.max=b.stok; if(j.value>b.stok) j.value=b.stok; list.innerHTML=''; list.style.display='none';}); list.appendChild(item);});});
     input.addEventListener('blur',()=>setTimeout(()=>{list.innerHTML=''; list.style.display='none';},150));
 }
 
@@ -144,7 +145,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 document.getElementById('btn-tambah-row').addEventListener('click',()=>createRow());
 document.addEventListener('click',e=>{if(e.target.classList.contains('btn-hapus-row')){if(barangList.children.length>1)e.target.closest('.barang-row').remove();else highlightError(barangList.querySelector('.barang-input'),"Minimal satu barang harus dipinjam.");}});
-document.addEventListener('input',e=>{if(e.target.classList.contains('jumlah-input')){const max=parseInt(e.target.max||1),min=parseInt(e.target.min||1),val=parseInt(e.target.value); if(val>max)e.target.value=max; if(val<min||isNaN(val))e.target.value=min;}});
+document.addEventListener('input',e=>{if(e.target.classList.contains('jumlah-input')){const max=parseInt(e.target.max||1),min=parseInt(e.target.min||0),val=parseInt(e.target.value); if(val>max)e.target.value=max; if(val<min||isNaN(val)||val<0)e.target.value=min;}});
+
+// Prevent negative input on number fields
+document.addEventListener('keydown',e=>{if(e.target.classList.contains('jumlah-input')&&(e.key==='-'||e.key==='e'||e.key==='E'||e.key==='+'))e.preventDefault();});
 
 document.getElementById('btn-submit').addEventListener('click',e=>{
     let valid=true; document.querySelectorAll('.form-control').forEach(clearError);
@@ -158,7 +162,7 @@ document.getElementById('btn-submit').addEventListener('click',e=>{
         valid = false;
     }
     
-    document.querySelectorAll('.barang-row').forEach(row=>{const nama=row.querySelector('.barang-input'),id=row.querySelector('input[name="barang_id[]"]'),jumlah=row.querySelector('.jumlah-input'),stok=parseInt(jumlah.max||1); if(!nama.value.trim()||!id.value.trim()){highlightError(nama,"Pilih barang dari daftar"); valid=false;} if(jumlah.value<1||jumlah.value>stok){highlightError(jumlah,`Jumlah antara 1 - ${stok}`); valid=false;}});
+    document.querySelectorAll('.barang-row').forEach(row=>{const nama=row.querySelector('.barang-input'),id=row.querySelector('input[name="barang_id[]"]'),jumlah=row.querySelector('.jumlah-input'),stok=parseInt(jumlah.max||1); if(!nama.value.trim()||!id.value.trim()){highlightError(nama,"Pilih barang dari daftar"); valid=false;} if(jumlah.value<0||jumlah.value>stok){highlightError(jumlah,`Jumlah antara 0 - ${stok}`); valid=false;}});
     if(!valid)e.preventDefault();
 });
 </script>

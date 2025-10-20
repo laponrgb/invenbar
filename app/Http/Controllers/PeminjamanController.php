@@ -26,12 +26,12 @@ class PeminjamanController extends Controller
 
     public function create()
     {
-        $barangs = Barang::where('jumlah_baik', '>', 0)->get();
+        $barangs = Barang::with('lokasi')->where('jumlah_baik', '>', 0)->get();
         return view('peminjaman.create', compact('barangs'));
     }
 
     public function store(Request $request)
-    {
+    {   
         $request->validate([
             'nama_peminjam' => 'required|string|max:255',
             'telepon_peminjam' => 'required|string|max:20',
@@ -85,7 +85,7 @@ class PeminjamanController extends Controller
             $reserved[$detail->barang_id] = ($reserved[$detail->barang_id] ?? 0) + $detail->jumlah;
         }
 
-        $barangs = Barang::orderBy('nama_barang')->get();
+        $barangs = Barang::with('lokasi')->orderBy('nama_barang')->get();
 
         // tambahkan properti available (tidak disimpan ke DB)
         foreach ($barangs as $barang) {
@@ -153,12 +153,14 @@ class PeminjamanController extends Controller
             }
 
             // 5) Update data peminjaman
-            $peminjaman->update($request->only([
+            $peminjaman->update(array_merge($request->only([
                 'nama_peminjam',
                 'telepon_peminjam',
                 'email_peminjam',
                 'tanggal_pinjam',
                 'tanggal_kembali',
+            ]), [
+                'status' => 'Dipinjam'
             ]));
 
             // 6) Reset detail dan masukkan detail baru sesuai $newQtyMap
@@ -191,21 +193,6 @@ class PeminjamanController extends Controller
         return back()->with('success', 'Barang berhasil dikembalikan.');
     }
 
-    public function undoReturn(Peminjaman $peminjaman)
-    {
-        foreach ($peminjaman->details as $detail) {
-            $barang = $detail->barang;
-            if ($barang && $barang->jumlah_baik >= $detail->jumlah) {
-                $barang->decrement('jumlah_baik', $detail->jumlah);
-            }
-        }
-
-        $peminjaman->update([
-            'status' => 'Dipinjam',
-            'tanggal_kembali' => null
-        ]);
-        return back()->with('success', 'Pengembalian barang dibatalkan.');
-    }
 
     public function destroy(Peminjaman $peminjaman)
     {
