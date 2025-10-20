@@ -145,7 +145,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 document.getElementById('btn-tambah-row').addEventListener('click',()=>createRow());
 document.addEventListener('click',e=>{if(e.target.classList.contains('btn-hapus-row')){if(barangList.children.length>1)e.target.closest('.barang-row').remove();else highlightError(barangList.querySelector('.barang-input'),"Minimal satu barang harus dipinjam.");}});
-document.addEventListener('input',e=>{if(e.target.classList.contains('jumlah-input')){const max=parseInt(e.target.max||1),min=parseInt(e.target.min||0),val=parseInt(e.target.value); if(val>max)e.target.value=max; if(val<min||isNaN(val))e.target.value=min;}});
+document.addEventListener('input',e=>{if(e.target.classList.contains('jumlah-input')){const max=parseInt(e.target.max||1),min=parseInt(e.target.min||0),val=parseInt(e.target.value); if(val>max)e.target.value=max; if(val<min||isNaN(val)||val<0)e.target.value=min;}});
+
+// Prevent negative input on number fields
+document.addEventListener('keydown',e=>{if(e.target.classList.contains('jumlah-input')&&(e.key==='-'||e.key==='e'||e.key==='E'||e.key==='+'))e.preventDefault();});
 
 document.getElementById('btn-submit').addEventListener('click',e=>{
     let valid=true; document.querySelectorAll('.form-control').forEach(clearError);
