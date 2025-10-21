@@ -30,11 +30,25 @@
                         [ 'route' => 'sumberdana.index', 'name' => 'Sumber Dana' ],
                     ];
 
+                    // Dropdown Data Sekolah
+                    $dataSekolah = [
+                        [ 'route' => 'data-siswa.index', 'name' => 'Data Siswa' ],
+                        [ 'route' => 'data-guru.index', 'name' => 'Data Guru' ],
+                    ];
+
                     // Tentukan halaman aktif di dalam dropdown
                     $activeDropdownName = 'Data Barang'; // default
                     foreach ($dataBarang as $item) {
                         if (request()->routeIs($item['route'])) {
                             $activeDropdownName = $item['name'];
+                            break;
+                        }
+                    }
+
+                    $activeSekolahName = 'Data Peminjam'; // default
+                    foreach ($dataSekolah as $item) {
+                        if (request()->routeIs($item['route'])) {
+                            $activeSekolahName = $item['name'];
                             break;
                         }
                     }
@@ -62,6 +76,24 @@
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="dataBarangDropdown">
                         @foreach ($dataBarang as $item)
+                            <li>
+                                <a class="dropdown-item {{ request()->routeIs($item['route']) ? 'active' : '' }}"
+                                   href="{{ route($item['route']) }}">
+                                    {{ $item['name'] }}
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
+                </li>
+
+                {{-- Dropdown Data Sekolah --}}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle {{ request()->is('data-siswa*') || request()->is('data-guru*') ? 'active' : '' }}"
+                       href="#" id="dataSekolahDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        {{ $activeSekolahName }}
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="dataSekolahDropdown">
+                        @foreach ($dataSekolah as $item)
                             <li>
                                 <a class="dropdown-item {{ request()->routeIs($item['route']) ? 'active' : '' }}"
                                    href="{{ route($item['route']) }}">
