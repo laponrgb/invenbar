@@ -13,6 +13,7 @@ class Peminjaman extends Model
         'nama_peminjam',
         'telepon_peminjam',
         'email_peminjam',
+        'foto_peminjam',
         'dusun',
         'desa',
         'rt',

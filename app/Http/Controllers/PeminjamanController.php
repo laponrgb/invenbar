@@ -7,6 +7,7 @@ use App\Models\Peminjaman;
 use App\Models\PeminjamanDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class PeminjamanController extends Controller
 {
@@ -67,6 +68,7 @@ class PeminjamanController extends Controller
             'nama_peminjam' => 'required|string|max:255',
             'telepon_peminjam' => 'required|string|max:20',
             'email_peminjam' => 'nullable|email',
+            'foto_peminjam' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'tanggal_pinjam' => 'required|date',
             'tanggal_kembali' => [
                 'nullable', 'date', 'after_or_equal:tanggal_pinjam',
@@ -81,8 +83,8 @@ class PeminjamanController extends Controller
             ],
             'barang_id' => 'required|array',
             'jumlah' => 'required|array',
-            // validasi alamat
-            'alamat_peminjam' => 'nullable|string|max:255',
+
+            // alamat rinci
             'dusun' => 'nullable|string|max:100',
             'desa' => 'nullable|string|max:100',
             'rt' => 'nullable|numeric|min:0',
@@ -95,11 +97,17 @@ class PeminjamanController extends Controller
         ]);
 
         DB::transaction(function () use ($request) {
+            $fotoPath = null;
+            if ($request->hasFile('foto_peminjam')) {
+                $fotoPath = $request->file('foto_peminjam')->store('peminjamans', 'public');
+            }
+
             $peminjaman = Peminjaman::create([
                 'kode_peminjaman' => $this->generateKodePeminjaman(),
                 'nama_peminjam' => $request->nama_peminjam,
                 'telepon_peminjam' => $request->telepon_peminjam,
                 'email_peminjam' => $request->email_peminjam,
+                'foto_peminjam' => $fotoPath,
                 'dusun' => $request->dusun,
                 'desa' => $request->desa,
                 'rt' => $request->rt,
@@ -126,7 +134,7 @@ class PeminjamanController extends Controller
                         'jumlah' => $jumlah,
                     ]);
                 } else {
-                    $nama = $barang ? $barang->nama_barang : 'ID:'.$barangId;
+                    $nama = $barang ? $barang->nama_barang : 'ID:' . $barangId;
                     throw new \Exception("Stok barang '{$nama}' tidak mencukupi.");
                 }
             }
@@ -160,6 +168,7 @@ class PeminjamanController extends Controller
             'nama_peminjam' => 'required|string|max:255',
             'telepon_peminjam' => 'required|string|max:20',
             'email_peminjam' => 'nullable|email',
+            'foto_peminjam' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'tanggal_pinjam' => 'required|date',
             'tanggal_kembali' => [
                 'nullable', 'date', 'after_or_equal:tanggal_pinjam',
@@ -174,8 +183,7 @@ class PeminjamanController extends Controller
             ],
             'barang_id' => 'required|array',
             'jumlah' => 'required|array',
-            // validasi alamat
-            'alamat_peminjam' => 'nullable|string|max:255',
+
             'dusun' => 'nullable|string|max:100',
             'desa' => 'nullable|string|max:100',
             'rt' => 'nullable|numeric|min:0',
@@ -188,24 +196,24 @@ class PeminjamanController extends Controller
         ]);
 
         DB::transaction(function () use ($request, $peminjaman) {
-            // Update data utama (termasuk alamat)
+            // Upload foto baru kalau ada
+            $fotoPath = $peminjaman->foto_peminjam;
+            if ($request->hasFile('foto_peminjam')) {
+                if ($fotoPath && Storage::disk('public')->exists($fotoPath)) {
+                    Storage::disk('public')->delete($fotoPath);
+                }
+                $fotoPath = $request->file('foto_peminjam')->store('peminjamans', 'public');
+            }
+
             $peminjaman->update($request->only([
-                'nama_peminjam',
-                'telepon_peminjam',
-                'email_peminjam',
-                'alamat_peminjam',
-                'dusun',
-                'desa',
-                'rt',
-                'rw',
-                'kecamatan',
-                'kabupaten',
-                'provinsi',
-                'kode_pos',
-                'catatan_alamat',
-                'tanggal_pinjam',
-                'tanggal_kembali',
-            ]) + ['status' => 'Dipinjam']);
+                'nama_peminjam', 'telepon_peminjam', 'email_peminjam',
+                'dusun', 'desa', 'rt', 'rw', 'kecamatan', 'kabupaten',
+                'provinsi', 'kode_pos', 'catatan_alamat',
+                'tanggal_pinjam', 'tanggal_kembali'
+            ]) + [
+                'foto_peminjam' => $fotoPath,
+                'status' => 'Dipinjam',
+            ]);
 
             // Sinkronisasi stok barang
             $oldDetails = $peminjaman->details()->get()->keyBy('barang_id');
@@ -214,8 +222,7 @@ class PeminjamanController extends Controller
                 $id = (int) $barangId;
                 $qty = (int) $request->jumlah[$i];
                 if ($qty <= 0) continue;
-                if (!isset($newQtyMap[$id])) $newQtyMap[$id] = 0;
-                $newQtyMap[$id] += $qty;
+                $newQtyMap[$id] = ($newQtyMap[$id] ?? 0) + $qty;
             }
 
             $oldIds = $oldDetails->keys()->all();
@@ -271,6 +278,10 @@ class PeminjamanController extends Controller
 
     public function destroy(Peminjaman $peminjaman)
     {
+        if ($peminjaman->foto_peminjam && Storage::disk('public')->exists($peminjaman->foto_peminjam)) {
+            Storage::disk('public')->delete($peminjaman->foto_peminjam);
+        }
+
         $peminjaman->delete();
         return back()->with('success', 'Data peminjaman berhasil dihapus.');
     }

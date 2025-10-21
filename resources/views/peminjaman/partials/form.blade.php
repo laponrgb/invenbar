@@ -18,7 +18,21 @@
         <x-form-input label="Email (Opsional)" name="email_peminjam" :value="$peminjaman->email_peminjam ?? ''" />
     </div>
 </div>
+<div class="row mb-3">
+    <div class="col-md-12">
+        <label class="form-label fw-bold">Foto Peminjam</label>
+        <input type="file" name="foto_peminjam" class="form-control" accept="image/*">
 
+        @if(isset($peminjaman) && $peminjaman->foto_peminjam)
+            <div class="mt-2">
+                <img src="{{ asset('storage/'.$peminjaman->foto_peminjam) }}" 
+                     alt="Foto Peminjam" 
+                     class="rounded shadow-sm" 
+                     style="max-width: 200px; height: auto;">
+            </div>
+        @endif
+    </div>
+</div>
 <hr>
 <h6 class="fw-bold mb-3">Alamat Peminjam</h6>
 
