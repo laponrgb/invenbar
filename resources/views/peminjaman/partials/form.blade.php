@@ -10,32 +10,74 @@
 <div class="row mb-3">
     <div class="col-md-4">
         <x-form-input label="Nama Peminjam" name="nama_peminjam" :value="$peminjaman->nama_peminjam ?? ''" required />
-        <small class="text-danger error-message" data-for="nama_peminjam"></small>
     </div>
     <div class="col-md-4">
         <x-form-input label="Nomor Telepon" name="telepon_peminjam" :value="$peminjaman->telepon_peminjam ?? ''" required />
-        <small class="text-danger error-message" data-for="telepon_peminjam"></small>
     </div>
     <div class="col-md-4">
         <x-form-input label="Email (Opsional)" name="email_peminjam" :value="$peminjaman->email_peminjam ?? ''" />
     </div>
 </div>
 
+<hr>
+<h6 class="fw-bold mb-3">Alamat Peminjam</h6>
+
 <div class="row mb-3">
     <div class="col-md-6">
-        <x-form-input type="date" label="Tanggal Peminjaman" name="tanggal_pinjam"
-            :value="$peminjaman->tanggal_pinjam ?? now()->format('Y-m-d')" required />
-        <small class="text-danger error-message" data-for="tanggal_pinjam"></small>
+        <x-form-input label="Dusun" name="dusun" :value="$peminjaman->dusun ?? ''" />
     </div>
     <div class="col-md-6">
-        <x-form-input type="date" label="Tanggal Pengembalian" name="tanggal_kembali"
-            :value="$peminjaman->tanggal_kembali ?? now()->addDays(3)->format('Y-m-d')" />
-        <small class="text-danger error-message" data-for="tanggal_kembali"></small>
+        <x-form-input label="Desa / Kelurahan" name="desa" :value="$peminjaman->desa ?? ''" />
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-3">
+        <x-form-input label="RT" name="rt" type="number" :value="$peminjaman->rt ?? ''" />
+    </div>
+    <div class="col-md-3">
+        <x-form-input label="RW" name="rw" type="number" :value="$peminjaman->rw ?? ''" />
+    </div>
+    <div class="col-md-6">
+        <x-form-input label="Kecamatan" name="kecamatan" :value="$peminjaman->kecamatan ?? ''" />
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <x-form-input label="Kabupaten / Kota" name="kabupaten" :value="$peminjaman->kabupaten ?? ''" />
+    </div>
+    <div class="col-md-4">
+        <x-form-input label="Provinsi" name="provinsi" :value="$peminjaman->provinsi ?? ''" />
+    </div>
+    <div class="col-md-2">
+        <x-form-input label="Kode Pos" name="kode_pos" :value="$peminjaman->kode_pos ?? ''" />
+    </div>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-12">
+        <x-form-input label="Catatan Alamat (Opsional)" name="catatan_alamat" 
+            :value="$peminjaman->catatan_alamat ?? ''" placeholder="Contoh: Dekat Masjid Al-Huda" />
     </div>
 </div>
 
 <hr>
-<h6>Barang yang Dipinjam</h6>
+<h6 class="fw-bold mb-3">Tanggal Peminjaman</h6>
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <x-form-input type="date" label="Tanggal Peminjaman" name="tanggal_pinjam"
+            :value="$peminjaman->tanggal_pinjam ?? now()->format('Y-m-d')" required />
+    </div>
+    <div class="col-md-6">
+        <x-form-input type="date" label="Tanggal Pengembalian" name="tanggal_kembali"
+            :value="$peminjaman->tanggal_kembali ?? now()->addDays(3)->format('Y-m-d')" />
+    </div>
+</div>
+
+<hr>
+<h6 class="fw-bold mb-3">Barang yang Dipinjam</h6>
 
 @php
     $jsonBarangs = $barangs->map(fn($b) => ['id'=>$b->id,'nama'=>$b->nama_barang,'stok'=>$b->jumlah_baik,'lokasi'=>$b->lokasi->nama_lokasi ?? 'Tidak ada lokasi']);

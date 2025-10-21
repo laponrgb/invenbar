@@ -15,50 +15,43 @@ class PeminjamanController extends Controller
         do {
             $kode = date('Ymd') . '-' . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
         } while (Peminjaman::where('kode_peminjaman', $kode)->exists());
-        
+
         return $kode;
     }
+
     public function index(Request $request)
     {
         $query = Peminjaman::with('details.barang');
 
-        // Filter berdasarkan pencarian nama peminjam atau kode peminjaman
         if ($request->filled('search')) {
             $searchTerm = $request->search;
             $query->where(function ($q) use ($searchTerm) {
-                $q->where('nama_peminjam', 'like', '%' . $searchTerm . '%')
-                  ->orWhere('kode_peminjaman', 'like', '%' . $searchTerm . '%');
+                $q->where('nama_peminjam', 'like', "%{$searchTerm}%")
+                  ->orWhere('kode_peminjaman', 'like', "%{$searchTerm}%");
             });
         }
 
-        // Filter berdasarkan status
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
-        // Filter berdasarkan tanggal pinjam
         if ($request->filled('tanggal_pinjam')) {
             $query->whereDate('tanggal_pinjam', $request->tanggal_pinjam);
         }
 
-        // Filter berdasarkan tanggal kembali
         if ($request->filled('tanggal_kembali')) {
             $query->whereDate('tanggal_kembali', $request->tanggal_kembali);
         }
 
-        // Filter berdasarkan lokasi barang yang dipinjam
         if ($request->filled('lokasi_id')) {
             $query->whereHas('details.barang', function ($q) use ($request) {
                 $q->where('lokasi_id', $request->lokasi_id);
             });
         }
 
-
         $peminjamans = $query->latest()->paginate(10)->withQueryString();
-        
-        // Ambil data untuk dropdown filter dengan lokasi
         $barangs = Barang::with('lokasi')->orderBy('nama_barang')->get();
-        
+
         return view('peminjaman.index', compact('peminjamans', 'barangs'));
     }
 
@@ -69,16 +62,14 @@ class PeminjamanController extends Controller
     }
 
     public function store(Request $request)
-    {   
+    {
         $request->validate([
             'nama_peminjam' => 'required|string|max:255',
             'telepon_peminjam' => 'required|string|max:20',
             'email_peminjam' => 'nullable|email',
             'tanggal_pinjam' => 'required|date',
             'tanggal_kembali' => [
-                'nullable',
-                'date',
-                'after_or_equal:tanggal_pinjam',
+                'nullable', 'date', 'after_or_equal:tanggal_pinjam',
                 function ($attribute, $value, $fail) use ($request) {
                     if ($value) {
                         $maxDate = date('Y-m-d', strtotime($request->tanggal_pinjam . ' +7 days'));
@@ -90,6 +81,17 @@ class PeminjamanController extends Controller
             ],
             'barang_id' => 'required|array',
             'jumlah' => 'required|array',
+            // validasi alamat
+            'alamat_peminjam' => 'nullable|string|max:255',
+            'dusun' => 'nullable|string|max:100',
+            'desa' => 'nullable|string|max:100',
+            'rt' => 'nullable|numeric|min:0',
+            'rw' => 'nullable|numeric|min:0',
+            'kecamatan' => 'nullable|string|max:100',
+            'kabupaten' => 'nullable|string|max:100',
+            'provinsi' => 'nullable|string|max:100',
+            'kode_pos' => 'nullable|string|max:10',
+            'catatan_alamat' => 'nullable|string|max:255',
         ]);
 
         DB::transaction(function () use ($request) {
@@ -98,6 +100,15 @@ class PeminjamanController extends Controller
                 'nama_peminjam' => $request->nama_peminjam,
                 'telepon_peminjam' => $request->telepon_peminjam,
                 'email_peminjam' => $request->email_peminjam,
+                'dusun' => $request->dusun,
+                'desa' => $request->desa,
+                'rt' => $request->rt,
+                'rw' => $request->rw,
+                'kecamatan' => $request->kecamatan,
+                'kabupaten' => $request->kabupaten,
+                'provinsi' => $request->provinsi,
+                'kode_pos' => $request->kode_pos,
+                'catatan_alamat' => $request->catatan_alamat,
                 'tanggal_pinjam' => $request->tanggal_pinjam,
                 'tanggal_kembali' => $request->tanggal_kembali,
                 'status' => 'Dipinjam',
@@ -126,10 +137,8 @@ class PeminjamanController extends Controller
 
     public function edit(Peminjaman $peminjaman)
     {
-        // Jangan ubah DB di sini. Hanya tambahkan properti "available" pada setiap barang
         $peminjaman->load('details.barang');
 
-        // kumpulkan reserve per barang pada peminjaman ini
         $reserved = [];
         foreach ($peminjaman->details as $detail) {
             $reserved[$detail->barang_id] = ($reserved[$detail->barang_id] ?? 0) + $detail->jumlah;
@@ -137,11 +146,8 @@ class PeminjamanController extends Controller
 
         $barangs = Barang::with('lokasi')->orderBy('nama_barang')->get();
 
-        // tambahkan properti available (tidak disimpan ke DB)
         foreach ($barangs as $barang) {
             $borrowed = $reserved[$barang->id] ?? 0;
-            // jumlah_baik di DB sudah dikurangi untuk peminjaman ini,
-            // jadi untuk tujuan form kita tambahkan kembali jumlah yang dipinjam oleh peminjaman ini saja
             $barang->available = $barang->jumlah_baik + $borrowed;
         }
 
@@ -156,9 +162,7 @@ class PeminjamanController extends Controller
             'email_peminjam' => 'nullable|email',
             'tanggal_pinjam' => 'required|date',
             'tanggal_kembali' => [
-                'nullable',
-                'date',
-                'after_or_equal:tanggal_pinjam',
+                'nullable', 'date', 'after_or_equal:tanggal_pinjam',
                 function ($attribute, $value, $fail) use ($request) {
                     if ($value) {
                         $maxDate = date('Y-m-d', strtotime($request->tanggal_pinjam . ' +7 days'));
@@ -170,10 +174,41 @@ class PeminjamanController extends Controller
             ],
             'barang_id' => 'required|array',
             'jumlah' => 'required|array',
+            // validasi alamat
+            'alamat_peminjam' => 'nullable|string|max:255',
+            'dusun' => 'nullable|string|max:100',
+            'desa' => 'nullable|string|max:100',
+            'rt' => 'nullable|numeric|min:0',
+            'rw' => 'nullable|numeric|min:0',
+            'kecamatan' => 'nullable|string|max:100',
+            'kabupaten' => 'nullable|string|max:100',
+            'provinsi' => 'nullable|string|max:100',
+            'kode_pos' => 'nullable|string|max:10',
+            'catatan_alamat' => 'nullable|string|max:255',
         ]);
 
         DB::transaction(function () use ($request, $peminjaman) {
-            // 1) Buat map jumlah baru (jumlah per barang). Jika ada duplicate row untuk barang yg sama, jumlah dijumlahkan.
+            // Update data utama (termasuk alamat)
+            $peminjaman->update($request->only([
+                'nama_peminjam',
+                'telepon_peminjam',
+                'email_peminjam',
+                'alamat_peminjam',
+                'dusun',
+                'desa',
+                'rt',
+                'rw',
+                'kecamatan',
+                'kabupaten',
+                'provinsi',
+                'kode_pos',
+                'catatan_alamat',
+                'tanggal_pinjam',
+                'tanggal_kembali',
+            ]) + ['status' => 'Dipinjam']);
+
+            // Sinkronisasi stok barang
+            $oldDetails = $peminjaman->details()->get()->keyBy('barang_id');
             $newQtyMap = [];
             foreach ($request->barang_id as $i => $barangId) {
                 $id = (int) $barangId;
@@ -183,49 +218,28 @@ class PeminjamanController extends Controller
                 $newQtyMap[$id] += $qty;
             }
 
-            // 2) Ambil detail lama dan keyBy barang_id
-            $oldDetails = $peminjaman->details()->get()->keyBy('barang_id');
-
-            // 3) Hitung semua id yang perlu di-handle (union old + new)
             $oldIds = $oldDetails->keys()->all();
             $newIds = array_keys($newQtyMap);
-            $allIds = array_values(array_unique(array_merge($oldIds, $newIds)));
+            $allIds = array_unique(array_merge($oldIds, $newIds));
 
-            // 4) Sesuaikan stok berdasarkan selisih (new - old)
             foreach ($allIds as $barangId) {
                 $barang = Barang::find($barangId);
                 if (!$barang) continue;
 
-                $oldQty = isset($oldDetails[$barangId]) ? (int) $oldDetails[$barangId]->jumlah : 0;
-                $newQty = isset($newQtyMap[$barangId]) ? (int) $newQtyMap[$barangId] : 0;
-
+                $oldQty = $oldDetails[$barangId]->jumlah ?? 0;
+                $newQty = $newQtyMap[$barangId] ?? 0;
                 $diff = $newQty - $oldQty;
 
                 if ($diff > 0) {
-                    // perlu mengurangi stok sebesar $diff
                     if ($barang->jumlah_baik < $diff) {
-                        throw new \Exception("Stok barang '{$barang->nama_barang}' tidak mencukupi (tersisa {$barang->jumlah_baik}).");
+                        throw new \Exception("Stok barang '{$barang->nama_barang}' tidak mencukupi.");
                     }
                     $barang->decrement('jumlah_baik', $diff);
                 } elseif ($diff < 0) {
-                    // perlu menambah stok sebesar -$diff (mengembalikan sisa)
                     $barang->increment('jumlah_baik', -$diff);
                 }
-                // jika diff == 0 → tidak perlu ubah stok
             }
 
-            // 5) Update data peminjaman
-            $peminjaman->update(array_merge($request->only([
-                'nama_peminjam',
-                'telepon_peminjam',
-                'email_peminjam',
-                'tanggal_pinjam',
-                'tanggal_kembali',
-            ]), [
-                'status' => 'Dipinjam'
-            ]));
-
-            // 6) Reset detail dan masukkan detail baru sesuai $newQtyMap
             $peminjaman->details()->delete();
             foreach ($newQtyMap as $barangId => $qty) {
                 $peminjaman->details()->create([
@@ -235,8 +249,7 @@ class PeminjamanController extends Controller
             }
         });
 
-        return redirect()->route('peminjaman.index')
-            ->with('success', 'Data peminjaman berhasil diperbarui dan stok disinkronisasi.');
+        return redirect()->route('peminjaman.index')->with('success', 'Data peminjaman berhasil diperbarui.');
     }
 
     public function return(Peminjaman $peminjaman)
@@ -250,11 +263,11 @@ class PeminjamanController extends Controller
 
         $peminjaman->update([
             'status' => 'Dikembalikan',
-            'tanggal_kembali' => now()->format('Y-m-d')
+            'tanggal_kembali' => now()->format('Y-m-d'),
         ]);
+
         return back()->with('success', 'Barang berhasil dikembalikan.');
     }
-
 
     public function destroy(Peminjaman $peminjaman)
     {
@@ -264,7 +277,6 @@ class PeminjamanController extends Controller
 
     public function extendForm(Peminjaman $peminjaman)
     {
-        // Hanya tampilkan form jika masih Dipinjam
         if ($peminjaman->status !== 'Dipinjam') {
             return redirect()->route('peminjaman.index')->with('error', 'Peminjaman tidak dapat diperpanjang.');
         }
@@ -280,9 +292,7 @@ class PeminjamanController extends Controller
 
         $request->validate([
             'tanggal_kembali' => [
-                'required',
-                'date',
-                'after_or_equal:' . $peminjaman->tanggal_pinjam,
+                'required', 'date', 'after_or_equal:' . $peminjaman->tanggal_pinjam,
                 function ($attribute, $value, $fail) use ($peminjaman) {
                     if ($value) {
                         $maxDate = date('Y-m-d', strtotime($peminjaman->tanggal_pinjam . ' +7 days'));
@@ -294,9 +304,7 @@ class PeminjamanController extends Controller
             ],
         ]);
 
-        $peminjaman->update([
-            'tanggal_kembali' => $request->tanggal_kembali,
-        ]);
+        $peminjaman->update(['tanggal_kembali' => $request->tanggal_kembali]);
 
         return redirect()->route('peminjaman.index')->with('success', 'Tanggal kembali berhasil diperpanjang.');
     }

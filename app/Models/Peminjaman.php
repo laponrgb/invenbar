@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Peminjaman extends Model
 {
-
     protected $table = 'peminjamans';
 
     protected $fillable = [
@@ -14,10 +13,20 @@ class Peminjaman extends Model
         'nama_peminjam',
         'telepon_peminjam',
         'email_peminjam',
+        'dusun',
+        'desa',
+        'rt',
+        'rw',
+        'kecamatan',
+        'kabupaten',
+        'provinsi',
+        'kode_pos',
+        'catatan_alamat',
         'tanggal_pinjam',
         'tanggal_kembali',
         'status',
     ];
+
 
     public function details()
     {
