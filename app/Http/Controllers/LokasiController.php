@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Lokasi;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -27,7 +28,8 @@ class LokasiController extends Controller implements HasMiddleware
     {
         $search = $request->search ?? null;
 
-        $lokasis = Lokasi::when($search, function ($query, $search) {
+        $lokasis = Lokasi::with('ketua') // ✅ eager load untuk mencegah N+1 query
+            ->when($search, function ($query, $search) {
                 $query->where('nama_lokasi', 'like', '%' . $search . '%');
             })
             ->latest()
@@ -43,7 +45,8 @@ class LokasiController extends Controller implements HasMiddleware
     public function create()
     {
         $lokasi = new Lokasi();
-        return view('lokasi.create', compact('lokasi'));
+        $users = User::orderBy('name')->get(); // ✅ untuk dropdown ketua
+        return view('lokasi.create', compact('lokasi', 'users'));
     }
 
     /**
@@ -53,6 +56,7 @@ class LokasiController extends Controller implements HasMiddleware
     {
         $validated = $request->validate([
             'nama_lokasi' => 'required|string|max:100|unique:lokasis,nama_lokasi',
+            'ketua_id' => 'nullable|exists:users,id',
         ]);
 
         Lokasi::create($validated);
@@ -75,7 +79,8 @@ class LokasiController extends Controller implements HasMiddleware
      */
     public function edit(Lokasi $lokasi)
     {
-        return view('lokasi.edit', compact('lokasi'));
+        $users = User::orderBy('name')->get(); // ✅ agar dropdown ketua muncul juga di edit
+        return view('lokasi.edit', compact('lokasi', 'users'));
     }
 
     /**
@@ -85,6 +90,7 @@ class LokasiController extends Controller implements HasMiddleware
     {
         $validated = $request->validate([
             'nama_lokasi' => 'required|string|max:100|unique:lokasis,nama_lokasi,' . $lokasi->id,
+            'ketua_id' => 'nullable|exists:users,id',
         ]);
 
         $lokasi->update($validated);

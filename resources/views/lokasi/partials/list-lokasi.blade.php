@@ -3,6 +3,7 @@
         <tr>
             <th>#</th>
             <th>Nama lokasi</th>
+            <th>Ketua Ruangan</th>
             @can('manage lokasi')
                 <th>&nbsp;</th>
             @endcan
@@ -13,6 +14,9 @@
         <tr>
             <td>{{ $lokasis->firstItem() + $index }}</td>
             <td>{{ $lokasi->nama_lokasi }}</td>
+            <td>
+                {{ $lokasi->ketua?->name ?? 'Belum ditentukan' }}
+            </td>
             @can('manage lokasi')
                 <td>
                     <x-tombol-aksi :href="route('lokasi.edit', $lokasi->id)" type="edit" />
@@ -22,7 +26,7 @@
         </tr>
     @empty
         <tr>
-            <td colspan="3" class="text-center">
+            <td colspan="4" class="text-center">
                 <div class="alert alert-danger">
                     Data lokasi belum tersedia.
                 </div>
