@@ -75,7 +75,19 @@ class PeminjamanController extends Controller
             'telepon_peminjam' => 'required|string|max:20',
             'email_peminjam' => 'nullable|email',
             'tanggal_pinjam' => 'required|date',
-            'tanggal_kembali' => 'nullable|date|after_or_equal:tanggal_pinjam',
+            'tanggal_kembali' => [
+                'nullable',
+                'date',
+                'after_or_equal:tanggal_pinjam',
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($value) {
+                        $maxDate = date('Y-m-d', strtotime($request->tanggal_pinjam . ' +7 days'));
+                        if ($value > $maxDate) {
+                            $fail('Tanggal pengembalian tidak boleh lebih dari 7 hari dari tanggal peminjaman.');
+                        }
+                    }
+                },
+            ],
             'barang_id' => 'required|array',
             'jumlah' => 'required|array',
         ]);
@@ -143,7 +155,19 @@ class PeminjamanController extends Controller
             'telepon_peminjam' => 'required|string|max:20',
             'email_peminjam' => 'nullable|email',
             'tanggal_pinjam' => 'required|date',
-            'tanggal_kembali' => 'nullable|date|after_or_equal:tanggal_pinjam',
+            'tanggal_kembali' => [
+                'nullable',
+                'date',
+                'after_or_equal:tanggal_pinjam',
+                function ($attribute, $value, $fail) use ($request) {
+                    if ($value) {
+                        $maxDate = date('Y-m-d', strtotime($request->tanggal_pinjam . ' +7 days'));
+                        if ($value > $maxDate) {
+                            $fail('Tanggal pengembalian tidak boleh lebih dari 7 hari dari tanggal peminjaman.');
+                        }
+                    }
+                },
+            ],
             'barang_id' => 'required|array',
             'jumlah' => 'required|array',
         ]);
@@ -255,7 +279,19 @@ class PeminjamanController extends Controller
         }
 
         $request->validate([
-            'tanggal_kembali' => 'required|date|after_or_equal:' . $peminjaman->tanggal_pinjam,
+            'tanggal_kembali' => [
+                'required',
+                'date',
+                'after_or_equal:' . $peminjaman->tanggal_pinjam,
+                function ($attribute, $value, $fail) use ($peminjaman) {
+                    if ($value) {
+                        $maxDate = date('Y-m-d', strtotime($peminjaman->tanggal_pinjam . ' +7 days'));
+                        if ($value > $maxDate) {
+                            $fail('Tanggal pengembalian tidak boleh lebih dari 7 hari dari tanggal peminjaman.');
+                        }
+                    }
+                },
+            ],
         ]);
 
         $peminjaman->update([

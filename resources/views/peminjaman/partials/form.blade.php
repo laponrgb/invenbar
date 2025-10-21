@@ -29,7 +29,7 @@
     </div>
     <div class="col-md-6">
         <x-form-input type="date" label="Tanggal Pengembalian" name="tanggal_kembali"
-            :value="$peminjaman->tanggal_kembali ?? now()->addDays(7)->format('Y-m-d')" />
+            :value="$peminjaman->tanggal_kembali ?? now()->addDays(3)->format('Y-m-d')" />
         <small class="text-danger error-message" data-for="tanggal_kembali"></small>
     </div>
 </div>
@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (tanggalPinjamInput.value) {
                 const pinjamDate = new Date(tanggalPinjamInput.value);
                 const kembaliDate = new Date(pinjamDate);
-                kembaliDate.setDate(kembaliDate.getDate() + 7);
+                kembaliDate.setDate(kembaliDate.getDate() + 3);
                 tanggalKembaliInput.value = kembaliDate.toISOString().split('T')[0];
             }
         });
@@ -157,9 +157,19 @@ document.getElementById('btn-submit').addEventListener('click',e=>{
     // Validasi tanggal pengembalian
     const tanggalPinjam = document.querySelector('input[name="tanggal_pinjam"]').value;
     const tanggalKembali = document.querySelector('input[name="tanggal_kembali"]').value;
-    if(tanggalKembali && tanggalPinjam && tanggalKembali < tanggalPinjam) {
-        highlightError(document.querySelector('input[name="tanggal_kembali"]'), 'Tanggal pengembalian tidak boleh lebih awal dari tanggal peminjaman');
-        valid = false;
+    if (tanggalPinjam && tanggalKembali) {
+        const pinjamDate = new Date(tanggalPinjam);
+        const kembaliDate = new Date(tanggalKembali);
+        const maxDate = new Date(pinjamDate);
+        maxDate.setDate(maxDate.getDate() + 3);
+        
+        if (kembaliDate < pinjamDate) {
+            highlightError(document.querySelector('input[name="tanggal_kembali"]'), 'Tanggal pengembalian tidak boleh lebih awal dari tanggal peminjaman');
+            valid = false;
+        } else if (kembaliDate > maxDate) {
+            highlightError(document.querySelector('input[name="tanggal_kembali"]'), 'Tanggal pengembalian tidak boleh lebih dari 7 hari dari tanggal peminjaman');
+            valid = false;
+        }
     }
     
     document.querySelectorAll('.barang-row').forEach(row=>{const nama=row.querySelector('.barang-input'),id=row.querySelector('input[name="barang_id[]"]'),jumlah=row.querySelector('.jumlah-input'),stok=parseInt(jumlah.max||1); if(!nama.value.trim()||!id.value.trim()){highlightError(nama,"Pilih barang dari daftar"); valid=false;} if(jumlah.value<0||jumlah.value>stok){highlightError(jumlah,`Jumlah antara 0 - ${stok}`); valid=false;}});
