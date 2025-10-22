@@ -4,9 +4,9 @@
 </div>
 
 <div class="mb-3">
-    <label for="ketua_id" class="form-label">Ketua Ruangan</label>
+    <label for="ketua_id" class="form-label">Pengelola Lokasi</label>
     <select name="ketua_id" id="ketua_id" class="form-select">
-        <option value="">-- Pilih Ketua Ruangan --</option>
+        <option value="">-- Pilih Pengelola Lokasi --</option>
         @foreach ($users as $user)
             <option value="{{ $user->id }}" 
                 {{ old('ketua_id', $lokasi->ketua_id ?? '') == $user->id ? 'selected' : '' }}>

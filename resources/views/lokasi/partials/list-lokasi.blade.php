@@ -3,7 +3,7 @@
         <tr>
             <th>#</th>
             <th>Nama lokasi</th>
-            <th>Ketua Ruangan</th>
+            <th>Pengelola Lokasi</th>
             @can('manage lokasi')
                 <th>&nbsp;</th>
             @endcan

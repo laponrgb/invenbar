@@ -6,6 +6,7 @@ use App\Models\DataGuru;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Cache;
 
 class DataGuruController extends Controller
 {
@@ -14,15 +15,19 @@ class DataGuruController extends Controller
      */
     public function index(Request $request)
     {
-        $query = DataGuru::query();
+        $cacheKey = 'data_guru_index_' . md5($request->fullUrl());
 
-        // Search by NIP or name
-        if ($request->filled('search')) {
-            $query->where('nip', 'like', '%' . $request->search . '%')
-                  ->orWhere('nama_guru', 'like', '%' . $request->search . '%');
-        }
+        $dataGuru = Cache::remember($cacheKey, now()->addMinutes(10), function () use ($request) {
+            $query = DataGuru::query();
 
-        $dataGuru = $query->latest()->paginate(10);
+            // Search by NIP or name
+            if ($request->filled('search')) {
+                $query->where('nip', 'like', '%' . $request->search . '%')
+                      ->orWhere('nama_guru', 'like', '%' . $request->search . '%');
+            }
+
+            return $query->latest()->paginate(10);
+        });
         
         return view('data-guru.index', compact('dataGuru'));
     }
@@ -48,6 +53,8 @@ class DataGuruController extends Controller
         ]);
 
         DataGuru::create($request->all());
+
+        Cache::flush(); // Clear cache after adding new data
 
         return redirect()->route('data-guru.index')
             ->with('success', 'Data guru berhasil ditambahkan.');
@@ -83,6 +90,8 @@ class DataGuruController extends Controller
 
         $dataGuru->update($request->all());
 
+        Cache::flush(); // Clear cache after updating data
+
         return redirect()->route('data-guru.index')
             ->with('success', 'Data guru berhasil diperbarui.');
     }
@@ -93,6 +102,8 @@ class DataGuruController extends Controller
     public function destroy(DataGuru $dataGuru)
     {
         $dataGuru->delete();
+
+        Cache::flush(); // Clear cache after deleting data
 
         return redirect()->route('data-guru.index')
             ->with('success', 'Data guru berhasil dihapus.');
