@@ -176,6 +176,13 @@ class BarangController extends Controller implements HasMiddleware
 
         $barang->delete();
 
+        if (request()->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Data barang berhasil dihapus.'
+            ]);
+        }
+
         return redirect()->route('barang.index')
             ->with('success', 'Data barang berhasil dihapus.');
     }

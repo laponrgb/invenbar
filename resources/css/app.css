@@ -87,3 +87,213 @@
         align-items: flex-start !important;
     }
 }
+
+/* ===================== Dashboard Enhancements ===================== */
+
+/* Smooth Transitions */
+* {
+    transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Card Styles */
+.card {
+    border: 0;
+    border-radius: 0.75rem;
+    overflow: hidden;
+}
+
+.card.shadow-sm {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+}
+
+/* Progress Bar Animation */
+.progress-bar {
+    animation: slideIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideIn {
+    from {
+        width: 0 !important;
+    }
+    to {
+        width: inherit !important;
+    }
+}
+
+/* Table Styles */
+.table {
+    font-size: 0.9rem;
+}
+
+.table thead th {
+    border: none;
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 1rem 0.75rem;
+    background-color: #f8f9fa;
+}
+
+.table tbody td {
+    padding: 1rem 0.75rem;
+    vertical-align: middle;
+}
+
+/* Badge Enhancements */
+.badge {
+    padding: 0.5rem 0.75rem;
+    font-weight: 500;
+    font-size: 0.8rem;
+}
+
+.badge + .badge {
+    margin-left: 0.25rem;
+}
+
+/* Button Styles */
+.btn {
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+}
+
+.btn-sm {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+}
+
+/* Icon Styles */
+.bi {
+    display: inline-block;
+    vertical-align: -0.125em;
+}
+
+/* Responsive Tables */
+@media (max-width: 768px) {
+    .table thead {
+        font-size: 0.75rem;
+    }
+    
+    .table tbody {
+        font-size: 0.9rem;
+    }
+    
+    .badge {
+        font-size: 0.7rem;
+        padding: 0.4rem 0.6rem;
+    }
+}
+
+/* Gradient Background */
+.bg-gradient {
+    background-attachment: fixed;
+}
+
+/* Shadow Variations */
+.shadow-sm {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+}
+
+.shadow {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.shadow-lg {
+    box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175) !important;
+}
+
+/* Animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card {
+    animation: fadeInUp 0.4s ease-out;
+}
+
+/* Hover Effects */
+.hover-shadow {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-shadow:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Text Classes */
+.fw-600 {
+    font-weight: 600 !important;
+}
+
+.fw-700 {
+    font-weight: 700 !important;
+}
+
+/* Card Stats */
+.card-stat {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-stat:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 1.5rem 3rem rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Scrollable Container */
+.snap-scroll {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}
+
+.snap-item {
+    scroll-snap-align: start;
+}
+
+/* Grid Responsive */
+@media (max-width: 576px) {
+    .row.g-4 {
+        --bs-gutter-x: 1rem;
+        --bs-gutter-y: 1rem;
+    }
+    
+    .col-lg-6, .col-xl-6 {
+        width: 100%;
+    }
+}
+
+/* Empty State Styles */
+.empty-state {
+    padding: 2rem 1rem;
+    text-align: center;
+}
+
+.empty-state i {
+    font-size: 2rem;
+    opacity: 0.5;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+/* Smooth Color Transitions */
+.text-primary, .text-secondary, .text-success,
+.text-danger, .text-warning, .text-info {
+    transition: color 0.2s ease;
+}
+
+/* ===================== End Dashboard Enhancements ===================== */

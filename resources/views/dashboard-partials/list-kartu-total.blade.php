@@ -1,6 +1,6 @@
-<div class="row">
+<div class="row g-3 mb-2">
     <div class="col-12">
-        <div class="d-flex overflow-auto pb-3 snap-scroll" style="gap: 1rem; scroll-snap-type: x mandatory;">
+        <div class="row g-3">
             @php
                 $kartus = [
                     [
@@ -54,12 +54,12 @@
 
                 @isset($role)
                     @role($role)
-                        <div class="flex-shrink-0 snap-item" style="min-width: calc(33.333% - 0.67rem); scroll-snap-align: start;">
+                        <div class="col-6 col-md-4 col-xl-2">
                             <x-kartu-total :text="$text" :route="$route" :total="$total" :icon="$icon" :color="$color" />
                         </div>
                     @endrole
                 @else
-                    <div class="flex-shrink-0 snap-item" style="min-width: calc(33.333% - 0.67rem); scroll-snap-align: start;">
+                    <div class="col-6 col-md-4 col-xl-2">
                         <x-kartu-total :text="$text" :route="$route" :total="$total" :icon="$icon" :color="$color" />
                     </div>
                 @endisset

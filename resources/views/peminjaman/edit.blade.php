@@ -1,7 +1,11 @@
 <x-main-layout title-page="Edit Peminjaman">
-    <form class="card" action="{{ route('peminjaman.update', $peminjaman->id) }}" method="POST">
+    <form class="card"
+          action="{{ route('peminjaman.update', $peminjaman->id) }}"
+          method="POST"
+          enctype="multipart/form-data">
         @csrf
         @method('PUT')
+
         <div class="card-body">
             @include('peminjaman.partials.form', ['update' => true])
         </div>
